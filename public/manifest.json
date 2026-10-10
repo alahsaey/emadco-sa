@@ -1,0 +1,55 @@
+{
+  "name": "عمادكو ERP - نظام مواد البناء والفوترة السحابية",
+  "short_name": "عمادكو ERP",
+  "description": "نظام عمادكو السحابي المتكامل لإدارة مبيعات ومخزون مواد البناء ونقاط البيع POS والفواتير الإلكترونية ZATCA.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/pwa-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["business", "finance", "productivity"],
+  "shortcuts": [
+    {
+      "name": "نقطة البيع POS",
+      "short_name": "POS",
+      "description": "فتح شاشات الكاشير ونقطة البيع السريعة",
+      "url": "/?tab=pos",
+      "icons": [{ "src": "/pwa-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "إعادة طباعة الفواتير",
+      "short_name": "الفواتير",
+      "description": "البحث عن الفواتير وطباعتها",
+      "url": "/?tab=invoices_lookup",
+      "icons": [{ "src": "/pwa-icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

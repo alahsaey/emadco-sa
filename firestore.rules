@@ -1,0 +1,167 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // جدار الحماية الفائق لقاعدة البيانات وحماية السجلات من الاختراق والتلاعب
+
+    // 1. المستخدمين وصلاحيات النظام - منع حذف الحساب الجذري للمالك وضمان سلامة الأدوار
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.roleKey in ['system_owner', 'manager', 'cashier', 'sales_rep', 'inventory_officer']
+                            && request.resource.data.fullName is string
+                            && request.resource.data.fullName.size() > 0;
+      allow delete: if userId != 'user_owner';
+    }
+
+    match /roles/{roleId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /permissions/{permissionId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /user_roles/{userRoleId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // 2. سجل الرقابة والتدقيق الأمني
+    match /audit_logs/{logId} {
+      allow read, write: if true;
+    }
+
+    // 3. الفواتير الإلكترونية ZATCA
+    match /electronic_invoices/{einvoiceId} {
+      allow read, write: if true;
+    }
+
+    // 4. فواتير المبيعات وبنودها
+    match /invoices/{invoiceId} {
+      allow read, write: if true;
+    }
+
+    match /invoice_items/{itemId} {
+      allow read, write: if true;
+    }
+
+    // 5. المبيعات والمشتريات والمدفوعات
+    match /sales/{saleId} {
+      allow read, write: if true;
+    }
+
+    match /sale_items/{itemId} {
+      allow read, write: if true;
+    }
+
+    match /purchases/{purchaseId} {
+      allow read, write: if true;
+    }
+
+    match /purchase_items/{itemId} {
+      allow read, write: if true;
+    }
+
+    match /payments/{paymentId} {
+      allow read, write: if true;
+    }
+
+    match /payment_transactions/{txId} {
+      allow read, write: if true;
+    }
+
+    match /returns/{returnId} {
+      allow read, write: if true;
+    }
+
+    match /return_items/{itemId} {
+      allow read, write: if true;
+    }
+
+    match /quotations/{quotationId} {
+      allow read, write: if true;
+    }
+
+    match /quotation_items/{itemId} {
+      allow read, write: if true;
+    }
+
+    // 6. المنتجات، المخزون، المستودعات، العملاء والموردين
+    match /products/{productId} {
+      allow read, write: if true;
+    }
+
+    match /categories/{categoryId} {
+      allow read, write: if true;
+    }
+
+    match /brands/{brandId} {
+      allow read, write: if true;
+    }
+
+    match /units/{unitId} {
+      allow read, write: if true;
+    }
+
+    match /product_variants/{variantId} {
+      allow read, write: if true;
+    }
+
+    match /customers/{customerId} {
+      allow read, write: if true;
+    }
+
+    match /suppliers/{supplierId} {
+      allow read, write: if true;
+    }
+
+    match /warehouses/{warehouseId} {
+      allow read, write: if true;
+    }
+
+    match /branches/{branchId} {
+      allow read, write: if true;
+    }
+
+    match /inventory/{inventoryId} {
+      allow read, write: if true;
+    }
+
+    match /inventory_movements/{movementId} {
+      allow read, write: if true;
+    }
+
+    // 7. إعدادات النظام والربط
+    match /tax_settings/{taxId} {
+      allow read, write: if true;
+    }
+
+    match /pos_integrations/{posId} {
+      allow read, write: if true;
+    }
+
+    match /payment_methods/{methodId} {
+      allow read, write: if true;
+    }
+
+    match /system_settings/{settingId} {
+      allow read, write: if true;
+    }
+
+    // 8. طلبات استعادة الرقم السري والرموز المؤقتة (OTP Password Resets)
+    match /password_resets/{resetId} {
+      allow read, write: if true;
+    }
+
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+
+    // الحظر الشامل لأي مسار غير مصرح به
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

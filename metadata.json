@@ -1,0 +1,8 @@
+{
+  "name": "Emadco",
+  "description": "نظام SaaS متكامل لإدارة المخزون والمبيعات ونقاط البيع (POS) وعمليات التوريد لمواد البناء ومستلزمات المقاولين.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

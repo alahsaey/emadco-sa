@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="عمادكو ERP" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <link rel="icon" type="image/svg+xml" href="/pwa-icon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <title>عمادكو (Emadco) - نظام إدارة مواد البناء ونقاط البيع السحابي</title>
+    <meta name="description" content="نظام عمادكو (Emadco) السحابي لإدارة مبيعات ومخزون مواد البناء ونقاط البيع POS والفواتير الإلكترونية ZATCA." />
+    <meta property="og:title" content="عمادكو (Emadco) - نظام إدارة مواد البناء ونقاط البيع السحابي" />
+    <meta property="og:description" content="نظام عمادكو (Emadco) السحابي لإدارة مبيعات ومخزون مواد البناء ونقاط البيع POS والفواتير الإلكترونية ZATCA." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      #initial-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        color: #f8fafc;
+        font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+        user-select: none;
+      }
+      .splash-logo-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 140px;
+        height: 140px;
+        margin-bottom: 24px;
+        animation: splashPulse 2.4s ease-in-out infinite alternate;
+      }
+      .splash-logo-img {
+        width: 130px;
+        height: 130px;
+        object-fit: contain;
+        filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
+      }
+      @keyframes splashPulse {
+        0% { transform: scale(0.96); filter: drop-shadow(0 6px 16px rgba(245, 158, 11, 0.2)); }
+        100% { transform: scale(1.04); filter: drop-shadow(0 16px 32px rgba(245, 158, 11, 0.45)); }
+      }
+      .splash-bar {
+        width: 160px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 999px;
+        overflow: hidden;
+        margin-top: 18px;
+        position: relative;
+      }
+      .splash-bar-progress {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 45%;
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        border-radius: 999px;
+        animation: splashProgress 1.6s ease-in-out infinite alternate;
+      }
+      @keyframes splashProgress {
+        0% { left: 0%; width: 25%; }
+        100% { left: 75%; width: 25%; }
+      }
+    </style>
+  </head>
+  <body class="font-sans antialiased bg-slate-50 text-slate-900 selection:bg-amber-500 selection:text-white">
+    <div id="root">
+      <!-- شاشة الإقلاع الأولية بالشعار الأصلي الشفاف المتناسق مع خلفية الجوال وشريط المهام -->
+      <div id="initial-splash">
+        <div class="splash-logo-container">
+          <img src="/pwa-icon.svg" alt="عمادكو لمواد البناء" class="splash-logo-img" />
+        </div>
+        <h1 style="font-size: 20px; font-weight: 800; margin: 0; color: #ffffff; letter-spacing: -0.02em;">مؤسسة عماد سعد آل سعيد</h1>
+        <p style="font-size: 13px; font-weight: 600; margin: 6px 0 0 0; color: #f59e0b;">نظام إدارة مواد البناء ونقاط البيع السحابي</p>
+        <div class="splash-bar">
+          <div class="splash-bar-progress"></div>
+        </div>
+        <span style="font-size: 11px; color: #94a3b8; margin-top: 12px; font-weight: 500;">جاري تهيئة النظام السحابي والبيانات...</span>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then((reg) => {
+            console.log('[SW] Registered successfully:', reg.scope);
+          }).catch((err) => {
+            console.warn('[SW] Registration failed:', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
+

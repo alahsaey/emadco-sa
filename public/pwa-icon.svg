@@ -1,0 +1,246 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- فلاتر الظلال والعمق ثلاثي الأبعاد -->
+    <filter id="logoShadow" x="-10%" y="-10%" width="125%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#071426" flood-opacity="0.45" />
+    </filter>
+    <filter id="innerGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.3" />
+    </filter>
+
+    <!-- تدرجات اللون الكحلي الفاخر (الجانب الأيسر) -->
+    <linearGradient id="navyMain" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E4570" />
+      <stop offset="45%" stop-color="#143457" />
+      <stop offset="100%" stop-color="#0B1E33" />
+    </linearGradient>
+    <linearGradient id="navyHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2D5D94" />
+      <stop offset="100%" stop-color="#143457" />
+    </linearGradient>
+    <linearGradient id="navyDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F2844" />
+      <stop offset="100%" stop-color="#061220" />
+    </linearGradient>
+
+    <!-- تدرجات اللون الذهبي/العنبري (الجانب الأيمن) -->
+    <linearGradient id="goldMain" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2B73F" />
+      <stop offset="45%" stop-color="#D99726" />
+      <stop offset="100%" stop-color="#B07314" />
+    </linearGradient>
+    <linearGradient id="goldHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFD67A" />
+      <stop offset="100%" stop-color="#D99726" />
+    </linearGradient>
+    <linearGradient id="goldDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#BF7F18" />
+      <stop offset="100%" stop-color="#805008" />
+    </linearGradient>
+
+    <!-- تدرجات الفولاذ والأدوات المعدنية -->
+    <linearGradient id="steelLight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E2E8F0" />
+      <stop offset="50%" stop-color="#CBD5E1" />
+      <stop offset="100%" stop-color="#94A3B8" />
+    </linearGradient>
+    <linearGradient id="steelDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#94A3B8" />
+      <stop offset="50%" stop-color="#64748B" />
+      <stop offset="100%" stop-color="#475569" />
+    </linearGradient>
+    <linearGradient id="handleWood" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E5A73B" />
+      <stop offset="100%" stop-color="#B27419" />
+    </linearGradient>
+
+    <!-- قناع عزل النصفين الأيمن والأيسر بدقة -->
+    <clipPath id="leftHalfClip">
+      <rect x="0" y="0" width="256" height="512" />
+    </clipPath>
+    <clipPath id="rightHalfClip">
+      <rect x="256" y="0" width="256" height="512" />
+    </clipPath>
+    <clipPath id="shieldInnerClip">
+      <polygon points="256,128 392,192 392,342 256,420 120,342 120,192" />
+    </clipPath>
+  </defs>
+
+  <!-- المجموعة الرئيسية مع الظل الحقيقي للشعار المعزول بدون خلفية بيضاء -->
+  <g filter="url(#logoShadow)">
+
+    <!-- ================= 1. المباني والأبراج العلوية (Skyline) ================= -->
+    <!-- الأبراج اليسرى (كحلي) -->
+    <g clip-path="url(#leftHalfClip)">
+      <!-- البرج الأوسط العالي -->
+      <path d="M256 12 L206 58 L206 172 L256 142 Z" fill="url(#navyMain)" />
+      <path d="M256 12 L206 58 L218 64 L256 30 Z" fill="url(#navyHighlight)" opacity="0.8" />
+      <!-- البرج الأيسر الأوسط -->
+      <path d="M198 80 L160 108 L160 210 L198 184 Z" fill="url(#navyMain)" />
+      <path d="M198 80 L160 108 L170 114 L198 94 Z" fill="url(#navyHighlight)" opacity="0.8" />
+      <!-- البرج الأيسر الخارجي -->
+      <path d="M152 136 L118 160 L118 240 L152 220 Z" fill="url(#navyDark)" />
+    </g>
+
+    <!-- الأبراج اليمنى (ذهبي) -->
+    <g clip-path="url(#rightHalfClip)">
+      <!-- البرج الأوسط العالي -->
+      <path d="M256 12 L306 58 L306 172 L256 142 Z" fill="url(#goldMain)" />
+      <path d="M256 12 L306 58 L294 64 L256 30 Z" fill="url(#goldHighlight)" opacity="0.8" />
+      <!-- البرج الأيمن الأوسط -->
+      <path d="M314 80 L352 108 L352 210 L314 184 Z" fill="url(#goldMain)" />
+      <path d="M314 80 L352 108 L342 114 L314 94 Z" fill="url(#goldHighlight)" opacity="0.8" />
+      <!-- البرج الأيمن الخارجي -->
+      <path d="M360 136 L394 160 L394 240 L360 220 Z" fill="url(#goldDark)" />
+    </g>
+
+    <!-- الفاصل الرأسي المركزي للأبراج -->
+    <line x1="256" y1="12" x2="256" y2="145" stroke="#0B1E33" stroke-width="2.5" />
+
+    <!-- ================= 2. الإطار السداسي الخارجي والجملون (House / Outer Hex) ================= -->
+    <!-- جناح السطح الأيسر الممتد (Eaves) -->
+    <path d="M256 68 L32 232 L46 250 L84 238 L256 112 Z" fill="url(#navyMain)" />
+    <path d="M256 68 L32 232 L22 254 L52 250 L256 94 Z" fill="url(#navyDark)" opacity="0.6" />
+
+    <!-- جناح السطح الأيمن الممتد (Eaves) -->
+    <path d="M256 68 L480 232 L466 250 L428 238 L256 112 Z" fill="url(#goldMain)" />
+    <path d="M256 68 L480 232 L490 254 L460 250 L256 94 Z" fill="url(#goldDark)" opacity="0.6" />
+
+    <!-- الهيكل الخارجي الجانبي -->
+    <!-- الأضلاع الخارجية اليسرى (كحلي) -->
+    <path d="M52 248 L94 236 L94 372 L62 388 L52 358 L52 248 Z" fill="url(#navyMain)" />
+    <path d="M52 358 L82 396 L58 418 L32 376 Z" fill="url(#navyDark)" />
+
+    <!-- الأضلاع الخارجية اليمنى (ذهبي) -->
+    <path d="M460 248 L418 236 L418 372 L450 388 L460 358 L460 248 Z" fill="url(#goldMain)" />
+    <path d="M460 358 L430 396 L454 418 L480 376 Z" fill="url(#goldDark)" />
+
+    <!-- ================= 3. الترس السفلي (Bottom Gear Wheel) ================= -->
+    <!-- أسنان الترس اليسرى (كحلي) -->
+    <g clip-path="url(#leftHalfClip)">
+      <path d="M256 462 L256 502 L224 492 L220 456 Z" fill="url(#navyMain)" />
+      <path d="M208 452 L192 484 L160 464 L174 436 Z" fill="url(#navyMain)" />
+      <path d="M162 430 L136 454 L110 424 L132 404 Z" fill="url(#navyMain)" />
+      <path d="M124 396 L92 410 L78 376 L108 366 Z" fill="url(#navyMain)" />
+      <!-- حلقة الترس الدائرية اليسرى -->
+      <path d="M256 464 C160 464 88 392 88 296 L124 296 C124 368 182 426 256 426 Z" fill="url(#navyDark)" />
+      <path d="M256 448 C172 448 108 384 108 296 L128 296 C128 366 186 422 256 422 Z" fill="url(#navyMain)" />
+    </g>
+
+    <!-- أسنان الترس اليمنى (ذهبي) -->
+    <g clip-path="url(#rightHalfClip)">
+      <path d="M256 462 L256 502 L288 492 L292 456 Z" fill="url(#goldMain)" />
+      <path d="M304 452 L320 484 L352 464 L338 436 Z" fill="url(#goldMain)" />
+      <path d="M350 430 L376 454 L402 424 L380 404 Z" fill="url(#goldMain)" />
+      <path d="M388 396 L420 410 L434 376 L404 366 Z" fill="url(#goldMain)" />
+      <!-- حلقة الترس الدائرية اليمنى -->
+      <path d="M256 464 C352 464 424 392 424 296 L388 296 C388 368 330 426 256 426 Z" fill="url(#goldDark)" />
+      <path d="M256 448 C340 448 404 384 404 296 L384 296 C384 366 326 422 256 422 Z" fill="url(#goldMain)" />
+    </g>
+
+    <!-- الحزام المسنن السفلي المتصل -->
+    <path d="M256 502 L234 494 L236 464 L256 468 L276 464 L278 494 Z" fill="#0E2A47" />
+    <path d="M256 502 L256 468 L276 464 L278 494 Z" fill="url(#goldDark)" />
+
+    <!-- ================= 4. درع الأيقونة الداخلي (Central Emblem Shield) ================= -->
+    <!-- إطار الدرع الخارجي ذو الحواف المشطوفة (Beveled Shield Frame) -->
+    <g>
+      <!-- النصف الأيسر للدرع (كحلي محدد) -->
+      <path d="M256 112 L106 186 L106 352 L256 438 L256 414 L126 340 L126 200 L256 136 Z" fill="url(#navyMain)" stroke="#0B1E33" stroke-width="1.5" />
+      <!-- النصف الأيمن للدرع (ذهبي محدد) -->
+      <path d="M256 112 L406 186 L406 352 L256 438 L256 414 L386 340 L386 200 L256 136 Z" fill="url(#goldMain)" stroke="#9A620F" stroke-width="1.5" />
+    </g>
+
+    <!-- أرضية الدرع الصافية الشفافة ذات الإضاءة الناعمة -->
+    <polygon points="256,134 386,198 386,340 256,414 126,340 126,198" fill="#F8FAFC" fill-opacity="0.96" stroke="#CBD5E1" stroke-width="2" />
+    <!-- تظليل ناعم ثلاثي الأبعاد لداخل الدرع -->
+    <polygon points="256,134 386,198 386,340 256,414 126,340 126,198" fill="url(#innerGlow)" opacity="0.08" />
+
+    <!-- ================= 5. النجمة الذهبية المركزية (Top Star) ================= -->
+    <polygon points="256,150 264,166 282,168 268,180 273,198 256,188 239,198 244,180 230,168 248,166" fill="url(#goldMain)" stroke="#B07314" stroke-width="1.2" stroke-linejoin="round" />
+    <polygon points="256,150 264,166 282,168 268,180 273,198 256,188" fill="url(#goldHighlight)" opacity="0.85" />
+
+    <!-- ================= 6. أدوات البناء والتشييد الأربعة (The 4 Core Tools) ================= -->
+
+    <!-- [الأداة 1 - اليسار]: ميزان الماء الهندسي (Spirit Level) -->
+    <g transform="translate(142, 210) rotate(22)" filter="url(#innerGlow)">
+      <!-- هيكل الميزان الذهبي مع الحواف الكحلية -->
+      <rect x="0" y="0" width="38" height="154" rx="6" fill="url(#goldMain)" stroke="#9A620F" stroke-width="2.5" />
+      <rect x="3" y="3" width="14" height="148" rx="3" fill="url(#goldHighlight)" opacity="0.5" />
+      
+      <!-- فتحات قبضة اليد الكحلية العلوية والسفلية -->
+      <rect x="7" y="14" width="24" height="12" rx="3" fill="url(#navyDark)" />
+      <rect x="7" y="128" width="24" height="12" rx="3" fill="url(#navyDark)" />
+
+      <!-- نافذة فقاعة الميزان الأفقية المركزية -->
+      <rect x="5" y="44" width="28" height="28" rx="14" fill="#FFFFFF" stroke="url(#navyMain)" stroke-width="3" />
+      <circle cx="19" cy="58" r="9" fill="#93C5FD" opacity="0.7" />
+      <circle cx="19" cy="58" r="4.5" fill="url(#goldMain)" stroke="#B07314" stroke-width="1" />
+
+      <!-- نافذة فقاعة الميزان الرأسية المستطيلة -->
+      <rect x="7" y="86" width="24" height="28" rx="4" fill="#FFFFFF" stroke="url(#navyMain)" stroke-width="2.5" />
+      <rect x="11" y="90" width="16" height="20" rx="2" fill="url(#navyDark)" />
+      <circle cx="19" cy="100" r="4" fill="url(#goldHighlight)" />
+    </g>
+
+    <!-- [الأداة 2 - المركز]: مطرقة البناء والنجارة الرئيسية (Claw Hammer) -->
+    <g transform="translate(256, 196)" filter="url(#innerGlow)">
+      <!-- رأس المطرقة الفولاذي المزدوج (مخلب + وجه الطرق) -->
+      <!-- رأس المخلب المقوس المنحني لليمين -->
+      <path d="M0 -36 C22 -36 50 -26 64 2 C48 -6 24 -12 0 -10 Z" fill="url(#steelLight)" stroke="#475569" stroke-width="1.8" stroke-linejoin="round" />
+      <!-- كتلة رأس المطرقة المركزية -->
+      <path d="M-18 -36 L8 -36 L8 -6 L-18 -6 Z" fill="url(#steelDark)" stroke="#334155" stroke-width="1.5" />
+      <!-- وجه الطرق البارز لليسار -->
+      <path d="M-18 -34 L-46 -30 L-50 -28 L-50 -14 L-46 -12 L-18 -8 Z" fill="url(#steelLight)" stroke="#475569" stroke-width="1.8" stroke-linejoin="round" />
+      <path d="M-50 -28 L-54 -27 L-54 -15 L-50 -14 Z" fill="url(#steelDark)" />
+
+      <!-- عنق المقبض (خشبي/ذهبي ميتاليك) -->
+      <path d="M-9 -6 L9 -6 L11 44 L-11 44 Z" fill="url(#handleWood)" stroke="#9A620F" stroke-width="1.5" />
+      <!-- تفاصيل لمعان العنق -->
+      <rect x="-3" y="-6" width="6" height="50" fill="#FDE68A" opacity="0.6" />
+
+      <!-- مقبض المطرقة المطاطي الأزرق الكحلي مع التمويجات الانسيابية -->
+      <path d="M-13 44 C-14 80 -16 130 -14 172 C-14 182 -4 188 0 188 C4 188 14 182 14 172 C16 130 14 80 13 44 Z" fill="url(#navyMain)" stroke="#0B1E33" stroke-width="2.5" />
+      <!-- خطوط التماسك والقبضة المانعة للانزلاق -->
+      <path d="M-11 72 L11 72 M-12 98 L12 98 M-12 124 L12 124 M-11 150 L11 150" stroke="#2563EB" stroke-width="2" opacity="0.5" stroke-linecap="round" />
+      <!-- تفريغ لمعان المقبض الأيسر -->
+      <path d="M-9 50 C-10 80 -11 120 -9 164" stroke="#60A5FA" stroke-width="2.5" stroke-linecap="round" opacity="0.75" />
+    </g>
+
+    <!-- [الأداة 3 - اليمين]: مسطرين البناء والتشطيب (Masonry Trowel) -->
+    <g transform="translate(306, 218) rotate(-18)" filter="url(#innerGlow)">
+      <!-- نصل المسطرين الفولاذي ذو الوجهين -->
+      <!-- الوجه الأيمن الفاتح -->
+      <polygon points="28,0 56,64 28,102 0,64" fill="url(#steelLight)" stroke="#64748B" stroke-width="2" stroke-linejoin="round" />
+      <!-- الوجه الأيسر المظلل لإعطاء عمق هندسي واقعي -->
+      <polygon points="28,0 28,102 0,64" fill="url(#steelDark)" opacity="0.85" />
+      <!-- خط شفرة المسطرين المركزية -->
+      <line x1="28" y1="0" x2="28" y2="102" stroke="#E2E8F0" stroke-width="1.8" />
+
+      <!-- ساق المسطرين الفولاذية المعكوفة (Gooseneck Shank) -->
+      <path d="M28 102 C28 116 38 124 38 134" fill="none" stroke="url(#steelDark)" stroke-width="5" stroke-linecap="round" />
+      <path d="M28 102 C28 116 38 124 38 134" fill="none" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round" />
+
+      <!-- مقبض المسطرين الخشبي المريح -->
+      <path d="M34 134 C30 144 26 166 32 186 C36 194 44 194 48 186 C54 166 50 144 46 134 Z" fill="url(#goldMain)" stroke="#9A620F" stroke-width="2" />
+      <path d="M36 140 C34 152 33 170 38 182" stroke="#FDE68A" stroke-width="2" stroke-linecap="round" />
+    </g>
+
+    <!-- [الأداة 4 - أقصى اليمين]: مفتاح الربط الهندسي (Combination Wrench) -->
+    <g transform="translate(352, 274) rotate(-34)" filter="url(#innerGlow)">
+      <!-- جسم المفتاح الكرومي -->
+      <path d="M-10 -40 C-22 -32 -26 -14 -18 4 L-12 12 L-6 92 L6 92 L12 12 L18 4 C26 -14 22 -32 10 -40 C-2 -48 -2 -48 -10 -40 Z" fill="url(#steelLight)" stroke="#475569" stroke-width="2" stroke-linejoin="round" />
+      
+      <!-- فك المفتاح المفتوح (Open Head) -->
+      <path d="M-12 -46 L0 -24 L12 -46 L4 -54 L-4 -54 Z" fill="#F8FAFC" stroke="#475569" stroke-width="1.8" stroke-linejoin="round" />
+      
+      <!-- التجويف الأزرق الكحلي الأوسط للمفتاح -->
+      <rect x="-4.5" y="16" width="9" height="66" rx="4" fill="url(#navyMain)" stroke="#0B1E33" stroke-width="1" />
+      
+      <!-- الحلقة المغلقة السفلية للمفتاح (Box End) -->
+      <circle cx="0" cy="108" r="16" fill="url(#steelLight)" stroke="#475569" stroke-width="2" />
+      <polygon points="0,98 8,103 8,113 0,118 -8,113 -8,103" fill="#F8FAFC" stroke="#334155" stroke-width="1.5" />
+    </g>
+
+  </g>
+</svg>
