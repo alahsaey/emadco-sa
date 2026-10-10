@@ -1225,19 +1225,35 @@ async function startServer() {
     }
   }, 60000);
 
+  const distPath = path.join(process.cwd(), 'dist');
+  const publicPath = path.join(process.cwd(), 'public');
+
+  // تقديم الملفات الثابتة لجميع البيئات (التطوير والنشر المشترك)
+  app.use(express.static(distPath));
+  app.use(express.static(publicPath));
+
   if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req: Request, res: Response) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
+    try {
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: 'spa',
+      });
+      app.use(vite.middlewares);
+    } catch (err) {
+      console.warn('[VITE] Running without Vite middleware:', err);
+    }
   }
+
+  // دعم التوجيه الأحادي SPA لجميع الروابط والصفحات
+  app.get('*', (req: Request, res: Response) => {
+    if (path.extname(req.path)) {
+      return res.status(404).send('Not Found');
+    }
+    const htmlFile = fs.existsSync(path.join(distPath, 'index.html'))
+      ? path.join(distPath, 'index.html')
+      : path.join(process.cwd(), 'index.html');
+    res.sendFile(htmlFile);
+  });
 
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`[EMADCO SERVER] Server running on http://0.0.0.0:${PORT}`);
