@@ -241,6 +241,36 @@ export const SettingsScreen: React.FC = () => {
     };
   }, [activeTab, settings.whatsappGateway?.sessionStatus, pairingMethod]);
 
+  // توليد تلقائي فوري للباركود أو كود الاقتران بمجرد فتح تبويب الواتساب لتجنب بقاء الشاشة فارغة
+  useEffect(() => {
+    if (activeTab !== 'whatsapp' || settings.whatsappGateway?.sessionStatus === 'connected') return;
+
+    if (pairingMethod === 'qr' && !liveQrDataUrl && !isGeneratingQr) {
+      setIsGeneratingQr(true);
+      generatePairingQRCode(pairingPhoneInput || '0500680180', false)
+        .then((res) => {
+          if (res.success && res.qrDataUrl) {
+            setLiveQrDataUrl(res.qrDataUrl);
+            if (res.remainingSeconds) setQrRemainingSeconds(res.remainingSeconds);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setIsGeneratingQr(false));
+    } else if (pairingMethod === 'code' && !pairingCodeDisplay && !isRequestingPairingCode) {
+      setIsRequestingPairingCode(true);
+      requestWhatsAppPairingCode(pairingPhoneInput || '0500680180')
+        .then((res) => {
+          if (res.success && res.pairingCode) {
+            setPairingCodeDisplay(res.pairingCode);
+            setPairingCodeInput(res.pairingCode);
+            if (res.waShareUrl) setPairingWaShareUrl(res.waShareUrl);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setIsRequestingPairingCode(false));
+    }
+  }, [activeTab, pairingMethod, settings.whatsappGateway?.sessionStatus]);
+
   const showToast = (type: 'success' | 'error', message: string) => {
     setToast({ type, message });
     setTimeout(() => setToast(null), 4000);
@@ -2566,11 +2596,15 @@ export const SettingsScreen: React.FC = () => {
                   <input
                     type="url"
                     value={customServerUrl}
-                    onChange={(e) => setCustomServerUrl(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setCustomServerUrl(val);
+                      setWhatsAppApiBaseUrl(val);
+                    }}
                     placeholder="اتركه فارغاً للاعتماد التلقائي على الخادم المدمج (مستحسن)"
                     className="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono text-slate-800 dir-ltr text-left"
                   />
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <button
                       type="button"
                       onClick={() => {
@@ -2588,13 +2622,13 @@ export const SettingsScreen: React.FC = () => {
                       onClick={() => {
                         setCustomServerUrl('');
                         setWhatsAppApiBaseUrl('');
-                        setServerTestResult({ success: true, message: 'تم تفعيل الاتصال المباشر التلقائي بالخادم المدمج.' });
-                        showToast('success', 'تم تفريغ الرابط وتفعيل الوضع التلقائي المباشر 100%.');
+                        setServerTestResult({ success: true, message: 'تم تفعيل الاتصال المباشر التلقائي بالخادم المدمج بنجاح.' });
+                        showToast('success', 'تم حذف الرابط وتفعيل الاتصال الداخلي المباشر بنجاح 100%.');
                       }}
                       className="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
-                      <span>استعادة الوضع التلقائي</span>
+                      <span>تفريغ وتفعيل المدمج</span>
                     </button>
 
                     <button
@@ -2624,6 +2658,13 @@ export const SettingsScreen: React.FC = () => {
                     </button>
                   </div>
                 </div>
+
+                {!customServerUrl && (
+                  <div className="p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 text-[11px] font-bold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>الوضع التلقائي نشط: يتم توليد الباركود وكود الاقتران مباشرة من الخادم المدمج دون الحاجة لأي روابط خارجية.</span>
+                  </div>
+                )}
 
                 {serverTestResult && (
                   <div className={`p-2.5 rounded-xl text-xs font-bold flex items-center gap-2 ${

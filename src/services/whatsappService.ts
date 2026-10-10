@@ -61,22 +61,35 @@ export function getWhatsAppApiBaseUrl(): string {
   try {
     if (typeof localStorage !== 'undefined') {
       const stored = localStorage.getItem(WA_CUSTOM_SERVER_URL_KEY);
-      if (stored && stored.trim()) {
-        const trimmed = stored.trim().replace(/\/+$/, '');
-        // Validate URL format
+      if (stored !== null) {
+        const trimmed = stored.trim();
+        // If empty or incomplete, purge from storage
+        if (!trimmed || trimmed === 'null' || trimmed === 'undefined') {
+          localStorage.removeItem(WA_CUSTOM_SERVER_URL_KEY);
+          return '';
+        }
+
+        // If it was the incomplete emadco-sa or local string without a valid domain, purge it
+        if (trimmed.includes('emadco-sa') && !trimmed.includes('.onrender.com') && !trimmed.includes('.koyeb.app')) {
+          localStorage.removeItem(WA_CUSTOM_SERVER_URL_KEY);
+          return '';
+        }
+
         if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
           try {
             const urlObj = new URL(trimmed);
-            // Must have a valid host with a dot or be localhost
             if (urlObj.hostname && (urlObj.hostname.includes('.') || urlObj.hostname === 'localhost')) {
               // If it matches current host, return empty string so relative URLs are used directly
               if (typeof window !== 'undefined' && urlObj.origin === window.location.origin) {
                 return '';
               }
-              return trimmed;
+              return trimmed.replace(/\/+$/, '');
             }
           } catch {}
         }
+
+        // If invalid URL, clean it up
+        localStorage.removeItem(WA_CUSTOM_SERVER_URL_KEY);
       }
     }
 
@@ -96,7 +109,8 @@ export function setWhatsAppApiBaseUrl(url: string): void {
   try {
     if (typeof localStorage !== 'undefined') {
       if (url && url.trim()) {
-        localStorage.setItem(WA_CUSTOM_SERVER_URL_KEY, url.trim().replace(/\/+$/, ''));
+        const clean = url.trim().replace(/\/+$/, '');
+        localStorage.setItem(WA_CUSTOM_SERVER_URL_KEY, clean);
       } else {
         localStorage.removeItem(WA_CUSTOM_SERVER_URL_KEY);
       }
