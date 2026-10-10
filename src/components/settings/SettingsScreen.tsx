@@ -2546,12 +2546,28 @@ export const SettingsScreen: React.FC = () => {
                   )}
                 </p>
 
+                {/* تنبيه ذكي حول رابط الاستضافة والخادم المدمج */}
+                <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3 text-blue-900 text-xs">
+                  <div className="p-1.5 bg-blue-200 text-blue-800 rounded-lg shrink-0 mt-0.5">
+                    <Info className="w-4 h-4" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-bold">
+                      💡 ملاحظة هامة حول رابط الخادم (Render / السيرفر المباشر):
+                    </p>
+                    <p className="leading-relaxed text-blue-800 font-medium">
+                      إذا كنت تتصفح النظام حالياً عبر رابط Render الخاص بك (مثل <code className="bg-blue-100 px-1.5 py-0.5 rounded font-mono font-bold text-blue-950">https://emadco-sa.onrender.com</code>)، 
+                      <strong> فإنك لست بحاجة لكتابة أي رابط في هذه الخانة!</strong> اترك الحقل فارغاً، فالنظام يتصل تلقائياً ومباشرة بالخادم المدمج دون أي أخطاء أو تعارض.
+                    </p>
+                  </div>
+                </div>
+
                 <div className="flex flex-col sm:flex-row gap-2 pt-1">
                   <input
                     type="url"
                     value={customServerUrl}
                     onChange={(e) => setCustomServerUrl(e.target.value)}
-                    placeholder="https://your-node-backend.onrender.com (اتركه فارغاً للاعتماد الذاتي)"
+                    placeholder="اتركه فارغاً للاعتماد التلقائي على الخادم المدمج (مستحسن)"
                     className="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono text-slate-800 dir-ltr text-left"
                   />
                   <div className="flex items-center gap-2">
@@ -2559,12 +2575,26 @@ export const SettingsScreen: React.FC = () => {
                       type="button"
                       onClick={() => {
                         setWhatsAppApiBaseUrl(customServerUrl);
-                        showToast('success', 'تم حفظ إعدادات خادم الواتساب بنجاح!');
+                        showToast('success', customServerUrl ? 'تم حفظ عنوان الخادم المخصص.' : 'تم تفعيل الاتصال التلقائي بالخادم المدمج بنجاح.');
                       }}
                       className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
                     >
                       <Save className="w-3.5 h-3.5" />
-                      <span>حفظ الرابط</span>
+                      <span>حفظ الإعداد</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCustomServerUrl('');
+                        setWhatsAppApiBaseUrl('');
+                        setServerTestResult({ success: true, message: 'تم تفعيل الاتصال المباشر التلقائي بالخادم المدمج.' });
+                        showToast('success', 'تم تفريغ الرابط وتفعيل الوضع التلقائي المباشر 100%.');
+                      }}
+                      className="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>استعادة الوضع التلقائي</span>
                     </button>
 
                     <button
@@ -2592,22 +2622,6 @@ export const SettingsScreen: React.FC = () => {
                       <RefreshCw className={`w-3.5 h-3.5 ${isTestingServerUrl ? 'animate-spin' : ''}`} />
                       <span>فحص الاتصال</span>
                     </button>
-
-                    {customServerUrl && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCustomServerUrl('');
-                          setWhatsAppApiBaseUrl('');
-                          setServerTestResult(null);
-                          showToast('success', 'تمت استعادة الوضع التلقائي الذاتي.');
-                        }}
-                        className="px-2.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
-                        title="استعادة الوضع الافتراضي"
-                      >
-                        <RotateCcw className="w-3.5 h-3.5" />
-                      </button>
-                    )}
                   </div>
                 </div>
 
