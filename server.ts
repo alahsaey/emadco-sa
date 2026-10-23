@@ -517,6 +517,12 @@ let waSock: any = null;
 let isInitializingWASock = false;
 
 const WA_SESSION_PERSIST_FILE = path.join(process.cwd(), 'whatsapp_session.json');
+const EXPENSES_DATA_FILE = path.join(process.cwd(), 'expenses_data.json');
+
+// تأكد من وجود ملف المصروفات عند البدء
+if (!fs.existsSync(EXPENSES_DATA_FILE)) {
+  fs.writeFileSync(EXPENSES_DATA_FILE, JSON.stringify({ expenses: [] }, null, 2), 'utf-8');
+}
 
 // حالة جلسة الواتساب المباشرة
 let whatsappSessionState: {
@@ -1195,6 +1201,31 @@ app.get('/api/whatsapp/outbox', (req: Request, res: Response) => {
     success: true,
     logs: whatsappOutboxLogs.slice(0, 30),
   });
+});
+
+// إدارة المصروفات
+app.get('/api/expenses', (req: Request, res: Response) => {
+  try {
+    const data = JSON.parse(fs.readFileSync(EXPENSES_DATA_FILE, 'utf-8'));
+    res.json({ success: true, expenses: data.expenses });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'تعذر قراءة بيانات المصروفات' });
+  }
+});
+
+app.post('/api/expenses', (req: Request, res: Response) => {
+  try {
+    const { amount, description, category, date } = req.body;
+    if (!amount || !description || !category) {
+      return res.status(400).json({ success: false, error: 'بيانات ناقصة' });
+    }
+    const data = JSON.parse(fs.readFileSync(EXPENSES_DATA_FILE, 'utf-8'));
+    data.expenses.push({ id: Date.now(), amount, description, category, date: date || new Date().toISOString() });
+    fs.writeFileSync(EXPENSES_DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    res.json({ success: true, message: 'تم إضافة المصروف بنجاح' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'تعذر حفظ المصروف' });
+  }
 });
 
 // مسار حماية يضمن عدم انزلاق أي طلب برمجيات /api/* إلى واجهة HTML في حال عدم التطابق

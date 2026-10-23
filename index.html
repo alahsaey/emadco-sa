@@ -109,6 +109,56 @@
         });
       }
     </script>
+    <script>
+      // دالة حقن واجهة إدارة المصروفات
+      window.initExpensesUI = () => {
+        const modal = document.createElement('div');
+        modal.id = 'expenses-modal';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:999999;';
+        modal.innerHTML = `
+          <div style="background:white;padding:20px;border-radius:10px;width:400px;">
+            <h3>إدارة المصروفات</h3>
+            <input type="number" id="exp-amount" placeholder="المبلغ" style="display:block;width:100%;margin-bottom:10px;padding:5px;">
+            <input type="text" id="exp-desc" placeholder="الوصف" style="display:block;width:100%;margin-bottom:10px;padding:5px;">
+            <input type="text" id="exp-cat" placeholder="التصنيف" style="display:block;width:100%;margin-bottom:10px;padding:5px;">
+            <button onclick="saveExpense()">حفظ المصروف</button>
+            <button onclick="document.getElementById('expenses-modal').remove()">إغلاق</button>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      };
+
+      window.saveExpense = async () => {
+        const amount = document.getElementById('exp-amount').value;
+        const description = document.getElementById('exp-desc').value;
+        const category = document.getElementById('exp-cat').value;
+        await fetch('/api/expenses', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ amount, description, category })
+        });
+        alert('تم حفظ المصروف');
+        const modal = document.getElementById('expenses-modal');
+        if (modal) modal.remove();
+      };
+      
+      // إضافة زر "إدارة المصروفات" بتصميم متناسق مع شريط التنقل السفلي
+      const navBar = document.querySelector('nav') || document.querySelector('.bottom-nav') || document.body;
+      const btn = document.createElement('button');
+      btn.innerHTML = `<span style="display:block;font-size:18px;">💰</span><span style="display:block;font-size:10px;">المصروفات</span>`;
+      btn.onclick = window.initExpensesUI;
+      // تنسيق الزر ليتناسب مع شريط الأدوات السفلي
+      btn.style.cssText = 'background:none; border:none; color:inherit; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; padding:5px;';
+      
+      // إضافته بجوار زر الإعدادات أو في مكان مناسب في شريط التنقل
+      if (navBar) {
+          navBar.appendChild(btn);
+      } else {
+          // fallback إذا لم يوجد شريط تنقل واضح
+          btn.style.cssText = 'position:fixed; bottom:80px; right:10px; z-index:9999; background:white; padding:10px; border-radius:50%; box-shadow:0 2px 5px rgba(0,0,0,0.2);';
+          document.body.appendChild(btn);
+      }
+    </script>
   </body>
 </html>
 
