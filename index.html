@@ -442,6 +442,38 @@
           }
         });
       }, 300);
+
+      // ربط المصروفات مع لوحة القيادة والمؤشرات وإحصائيات الأرباح
+      setInterval(() => {
+        const expenses = window.getLocalExpenses();
+        const now = new Date();
+        const currentMonth = now.toISOString().slice(0, 7);
+        const monthExpensesTotal = expenses
+          .filter(e => e.date && e.date.startsWith(currentMonth))
+          .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+        // البحث عن بطاقات الإحصائيات في لوحة القيادة لإدراج بطاقة مصروفات المحل وتحديث صافي الربح
+        const statCards = document.querySelectorAll('div');
+        statCards.forEach(card => {
+          if (card.textContent && card.textContent.includes('الأرباح الإجمالية') && card.parentElement) {
+            const gridParent = card.parentElement;
+            if (!gridParent.querySelector('#injected-expenses-stat-card')) {
+              const expCard = document.createElement('div');
+              expCard.id = 'injected-expenses-stat-card';
+              expCard.style.cssText = 'background:#1e293b; color:white; padding:20px; border-radius:16px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); display:flex; flex-direction:column; justify-content:space-between; direction:rtl;';
+              expCard.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-size:13px; color:#cbd5e1; font-weight:700;">مصروفات المحل والمؤسسة (الشهر)</span>
+                  <span style="font-size:18px;">💰</span>
+                </div>
+                <div style="font-size:22px; font-weight:800; color:#f59e0b; margin:10px 0;">${monthExpensesTotal.toFixed(2)} ر.س</div>
+                <div style="font-size:11px; color:#94a3b8;">إجمالي مصاريف أجار المحل، الفواتير والرواتب للشهر الحالي</div>
+              `;
+              gridParent.appendChild(expCard);
+            }
+          }
+        });
+      }, 1000);
     </script>
   </body>
 </html>
