@@ -443,7 +443,7 @@
         });
       }, 300);
 
-      // ربط المصروفات مع لوحة القيادة والمؤشرات وحساب صافي الربح الفعلي بدقة وعدم التكرار نهائياً
+      // ربط المصروفات مع لوحة القيادة والمؤشرات وحساب صافي الربح الفعلي كبطاقات قياسية ضمن شبكة الإحصائيات
       setInterval(() => {
         const expenses = window.getLocalExpenses();
         const now = new Date();
@@ -452,14 +452,14 @@
           .filter(e => e.date && e.date.startsWith(currentMonth))
           .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-        // البحث عن بطاقة الأرباح الإجمالية في الشبكة الرئيسية مرة واحدة فقط
+        // البحث عن شبكة الإحصائيات التي تحتوي على بطاقة "الأرباح الإجمالية (Gross Profit)"
         const allDivs = document.querySelectorAll('div');
-        let targetGrid = null;
+        let statsGrid = null;
         let grossProfitVal = 288.00;
 
         for (const div of allDivs) {
           if (div.textContent && div.textContent.includes('الأرباح الإجمالية (Gross Profit)') && div.parentElement) {
-            targetGrid = div.parentElement;
+            statsGrid = div.parentElement;
             const text = div.textContent;
             const match = text.match(/([\d,]+\.\d{2})/);
             if (match) {
@@ -471,39 +471,39 @@
 
         const netProfitVal = grossProfitVal - monthExpensesTotal;
 
-        // التحقق مما إذا كانت البطاقات موجودة مسبقاً لتحديثها أو إنشائها لمرة واحدة فقط
         let expCard = document.getElementById('injected-expenses-stat-card');
         let netCard = document.getElementById('injected-net-profit-card');
 
-        if (targetGrid) {
+        // إدراج البطاقات كعناصر قياسية داخل شبكة الإحصائيات (Stats Grid) لتظهر بجانب باقي بطاقات الصورة رقم 2
+        if (statsGrid) {
           if (!expCard) {
             expCard = document.createElement('div');
             expCard.id = 'injected-expenses-stat-card';
-            expCard.style.cssText = 'background:#1e293b; color:white; padding:20px; border-radius:16px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); display:flex; flex-direction:column; justify-content:space-between; direction:rtl;';
-            targetGrid.appendChild(expCard);
+            expCard.style.cssText = 'background: #0f172a; color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; direction: rtl; min-height: 120px;';
+            statsGrid.appendChild(expCard);
           }
           expCard.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px; color:#cbd5e1; font-weight:700;">مصروفات المحل والمؤسسة (الشهر)</span>
-              <span style="font-size:18px;">💰</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 13px; color: #cbd5e1; font-weight: 700;">مصروفات المحل والمؤسسة (الشهر)</span>
+              <span style="font-size: 18px;">💰</span>
             </div>
-            <div style="font-size:22px; font-weight:800; color:#f59e0b; margin:10px 0;">${monthExpensesTotal.toFixed(2)} ر.س</div>
-            <div style="font-size:11px; color:#94a3b8;">إجمالي مصاريف أجار المحل، الفواتير والرواتب للشهر الحالي</div>
+            <div style="font-size: 22px; font-weight: 800; color: #f59e0b; margin: 10px 0;">${monthExpensesTotal.toFixed(2)} ر.س</div>
+            <div style="font-size: 11px; color: #94a3b8;">إجمالي مصاريف أجار المحل، الفواتير والرواتب للشهر الحالي</div>
           `;
 
           if (!netCard) {
             netCard = document.createElement('div');
             netCard.id = 'injected-net-profit-card';
-            netCard.style.cssText = 'background:linear-gradient(135deg, #065f46, #047857); color:white; padding:20px; border-radius:16px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); display:flex; flex-direction:column; justify-content:space-between; direction:rtl;';
-            targetGrid.appendChild(netCard);
+            netCard.style.cssText = 'background: linear-gradient(135deg, #065f46, #047857); color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; direction: rtl; min-height: 120px;';
+            statsGrid.appendChild(netCard);
           }
           netCard.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px; color:#a7f3d0; font-weight:700;">صافي الربح الفعلي (Net Profit)</span>
-              <span style="font-size:18px;">📈</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 13px; color: #a7f3d0; font-weight: 700;">صافي الربح الفعلي (Net Profit)</span>
+              <span style="font-size: 18px;">📈</span>
             </div>
-            <div style="font-size:22px; font-weight:800; color:#34d399; margin:10px 0;">${netProfitVal.toFixed(2)} ر.س</div>
-            <div style="font-size:11px; color:#a7f3d0;">الأرباح الإجمالية (${grossProfitVal.toFixed(2)}) - المصروفات (${monthExpensesTotal.toFixed(2)})</div>
+            <div style="font-size: 22px; font-weight: 800; color: #34d399; margin: 10px 0;">${netProfitVal.toFixed(2)} ر.س</div>
+            <div style="font-size: 11px; color: #a7f3d0;">الأرباح الإجمالية (${grossProfitVal.toFixed(2)}) - المصروفات (${monthExpensesTotal.toFixed(2)})</div>
           `;
         }
       }, 1000);
