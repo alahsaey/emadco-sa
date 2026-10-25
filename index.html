@@ -168,6 +168,9 @@
           const data = await res.json();
           const expenses = data.expenses || [];
 
+          // فرز المصروفات حسب التاريخ من الأحدث للأقدم
+          expenses.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
           const now = new Date();
           const currentMonth = now.toISOString().slice(0, 7); // YYYY-MM
           const currentYear = now.toISOString().slice(0, 4); // YYYY
@@ -262,6 +265,9 @@
         const res = await fetch('/api/expenses');
         const data = await res.json();
         const expenses = data.expenses || [];
+
+        // فرز المصروفات حسب التاريخ من الأحدث للأقدم
+        expenses.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 
         const now = new Date();
         const currentMonth = now.toISOString().slice(0, 7);
@@ -367,7 +373,7 @@
         window.renderExpensesSection();
       };
 
-      // مراقب DOM فائق الدقة لإدراج زر "مصروفات المؤسسة" بجانب تبويب "لوحة القيادة والمؤشرات" وفي الشريط العلوي والزر العائم
+      // مراقب DOM فائق الدقة لإدراج زر "مصروفات المؤسسة" بجانب تبويب "لوحة القيادة والمؤشرات" وفي الزر العائم
       setInterval(() => {
         // 1. البحث عن زر "لوحة القيادة والمؤشرات" في شريط التنقل الرئيسي لإدراج زر المصروفات بجانبه مباشرة
         const allEls = document.querySelectorAll('button, div, span, a');
@@ -410,17 +416,7 @@
         });
       }, 500);
 
-      // إضافة زر ثابت في أعلى اليمين (بجانب اسم المنشأة) لتأكيد ظهور الزر دائماً
-      if (!document.getElementById('top-bar-expenses-btn')) {
-        const topBarBtn = document.createElement('button');
-        topBarBtn.id = 'top-bar-expenses-btn';
-        topBarBtn.innerHTML = '💰 مصروفات المؤسسة';
-        topBarBtn.onclick = window.initExpensesUI;
-        topBarBtn.style.cssText = 'position: fixed; top: 12px; right: 280px; z-index: 9999999; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 12px; border: 2px solid white; box-shadow: 0 4px 12px rgba(245,158,11,0.4); cursor: pointer; font-family: inherit;';
-        document.body.appendChild(topBarBtn);
-      }
-
-      // إضافة زر عائم فائق الوضوح في أسفل الشاشة (يمين)
+      // إضافة زر عائم فائق الوضوح في أسفل الشاشة (يمين) - تم إزالة الزر العلوي نهائياً بناءً على طلبك
       if (!document.getElementById('floating-expenses-btn')) {
         const floatBtn = document.createElement('button');
         floatBtn.id = 'floating-expenses-btn';
@@ -431,6 +427,22 @@
         floatBtn.onmouseout = () => floatBtn.style.transform = 'scale(1)';
         document.body.appendChild(floatBtn);
       }
+
+      // تنظيف القوائم المنسدلة وإزالة الخيار المكرر "سجل التدقيق والأمان" نهائياً لمنع أي تكرار
+      setInterval(() => {
+        const allNodes = document.querySelectorAll('button, a, div, span');
+        allNodes.forEach(el => {
+          if (el.textContent && el.textContent.includes('سجل التدقيق والأمان') && el.closest('.absolute, .fixed, [role="menu"], div[style*="z-index"]')) {
+            const container = el.closest('button, a, div[role="menuitem"], div') || el.parentElement;
+            if (container && container.parentElement) {
+              // إزالة عنصر القائمة الخاص بسجل التدقيق والأمان لتجنب التكرار مع إعدادات المنشأة
+              if (container.textContent && container.textContent.includes('سجل التدقيق والأمان') && container.textContent.length < 100) {
+                container.remove();
+              }
+            }
+          }
+        });
+      }, 300);
     </script>
   </body>
 </html>
