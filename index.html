@@ -79,6 +79,41 @@
         0% { left: 0%; width: 25%; }
         100% { left: 75%; width: 25%; }
       }
+      #floating-expenses-btn {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        z-index: 99999;
+        background: #0f172a;
+        color: #ffffff;
+        border: 2px solid #f59e0b;
+        border-radius: 9999px;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.45), 0 0 15px rgba(245, 158, 11, 0.25);
+        direction: rtl;
+        font-family: inherit;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        user-select: none;
+      }
+      #floating-expenses-btn:hover {
+        transform: translateY(-2px) scale(1.02);
+        background: #1e293b;
+        box-shadow: 0 14px 28px -4px rgba(0, 0, 0, 0.55), 0 0 20px rgba(245, 158, 11, 0.4);
+        border-color: #fbbf24;
+      }
+      #floating-expenses-btn:active {
+        transform: translateY(0) scale(0.98);
+      }
+      @media (min-width: 1024px) {
+        #floating-expenses-btn {
+          bottom: 24px;
+          right: 24px;
+        }
+      }
     </style>
     <script type="module" crossorigin src="/assets/index-DXj0RJXN.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-CzAWPH_Z.css">
@@ -98,17 +133,6 @@
         <span style="font-size: 11px; color: #94a3b8; margin-top: 12px; font-weight: 500;">جاري تهيئة النظام السحابي والبيانات...</span>
       </div>
     </div>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then((reg) => {
-            console.log('[SW] Registered successfully:', reg.scope);
-          }).catch((err) => {
-            console.warn('[SW] Registration failed:', err);
-          });
-        });
-      }
-    </script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -264,12 +288,7 @@
         document.getElementById('modal-exp-cat').value = '';
         alert('تمت إضافة المصروف بنجاح');
         window.loadExpensesModalData();
-        if (typeof window.renderExpensesSection === 'function') {
-          window.renderExpensesSection();
-        }
       };
-
-      let activeExpensesTab = false;
 
       window.deleteExpense = async (id) => {
         if (!confirm('هل أنت متأكد من حذف هذا المصروف؟')) return;
@@ -286,156 +305,96 @@
         } catch (e) {}
 
         window.loadExpensesModalData();
-        if (typeof window.renderExpensesSection === 'function') {
-          window.renderExpensesSection();
+      };
+
+      // 1. إعادة الزر العائم لإدارة وتسجيل المصروفات في أسفل يمين الشاشة
+      const ensureFloatingExpensesButton = () => {
+        let btn = document.getElementById('floating-expenses-btn');
+        if (!btn) {
+          btn = document.createElement('button');
+          btn.id = 'floating-expenses-btn';
+          btn.type = 'button';
+          btn.setAttribute('aria-label', 'مصروفات المحل والمؤسسة');
+          btn.title = 'إدارة وتسجيل مصروفات المحل والمؤسسة';
+          btn.onclick = () => window.initExpensesUI();
+          btn.innerHTML = `
+            <span style="font-size: 18px; line-height: 1;">💰</span>
+            <span style="font-weight: 800; font-size: 13.5px; white-space: nowrap;">مصروفات المحل والمؤسسة</span>
+          `;
+          document.body.appendChild(btn);
         }
       };
 
-      window.renderExpensesSection = async () => {
-        let container = document.getElementById('store-expenses-container');
-        if (!container) {
-          container = document.createElement('div');
-          container.id = 'store-expenses-container';
-          container.style.cssText = 'background:white; padding:24px; border-radius:16px; margin-top:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); direction:rtl;';
-        }
-        
-        const expenses = await window.getExpenses();
-        expenses.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-
-        const now = new Date();
-        const currentMonth = now.toISOString().slice(0, 7);
-        const currentYear = now.toISOString().slice(0, 4);
-
-        const monthTotal = expenses
-          .filter(e => e.date && e.date.startsWith(currentMonth))
-          .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-
-        const yearTotal = expenses
-          .filter(e => e.date && e.date.startsWith(currentYear))
-          .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-
-        container.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:15px; border-bottom:2px solid #f1f5f9; padding-bottom:15px;">
-            <div>
-              <h2 style="font-size:20px; font-weight:800; color:#1e293b; margin:0;">مصروفات ومصاريف المحل والمؤسسة</h2>
-              <p style="margin:4px 0 0 0; color:#64748b; font-size:13px;">إدارة وتتبع أجار المحل، الفواتير، الصيانة، والرواتب بدقة</p>
-            </div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <div style="background:#fef3c7; color:#92400e; padding:10px 16px; border-radius:10px; font-weight:700; font-size:13px; border:1px solid #fcd34d;">
-                إجمالي الشهر: ${monthTotal.toFixed(2)} ر.س
-              </div>
-              <div style="background:#f1f5f9; color:#334155; padding:10px 16px; border-radius:10px; font-weight:700; font-size:13px; border:1px solid #cbd5e1;">
-                إجمالي السنة: ${yearTotal.toFixed(2)} ر.س
-              </div>
-            </div>
-          </div>
-          
-          <div style="background:#f8fafc; padding:20px; border-radius:12px; margin-bottom:25px; border:1px solid #e2e8f0;">
-            <h4 style="margin:0 0 12px 0; font-size:15px; font-weight:700; color:#334155;">تسجيل مصروف جديد</h4>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
-              <input type="number" id="tab-exp-amount" placeholder="المبلغ (ر.س)" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-family:inherit;">
-              <input type="text" id="tab-exp-desc" placeholder="الوصف (أجار المحل، كهرباء...)" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-family:inherit;">
-              <input type="text" id="tab-exp-cat" placeholder="التصنيف (ثابت، تشغيلي، رواتب...)" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-family:inherit;">
-              <input type="date" id="tab-exp-date" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-family:inherit;">
-              <button onclick="window.submitTabExpense()" style="background:#f59e0b; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:700; cursor:pointer; font-family:inherit;">إضافة المصروف</button>
-            </div>
-          </div>
-
-          <div>
-            <h4 style="margin:0 0 12px 0; font-size:15px; font-weight:700; color:#334155;">سجل المصروفات المسجلة</h4>
-            <div style="overflow-x:auto;">
-              <table style="width:100%; border-collapse:collapse; text-align:right; font-size:13px;">
-                <thead>
-                  <tr style="background:#f1f5f9; color:#475569;">
-                    <th style="padding:12px; border-bottom:2px solid #e2e8f0; font-weight:700;">التاريخ</th>
-                    <th style="padding:12px; border-bottom:2px solid #e2e8f0; font-weight:700;">الوصف</th>
-                    <th style="padding:12px; border-bottom:2px solid #e2e8f0; font-weight:700;">التصنيف</th>
-                    <th style="padding:12px; border-bottom:2px solid #e2e8f0; font-weight:700;">المبلغ</th>
-                    <th style="padding:12px; border-bottom:2px solid #e2e8f0; font-weight:700; text-align:center;">الإجراء</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${expenses.length === 0 ? '<tr><td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">لا توجد مصروفات مسجلة حتى الآن</td></tr>' : 
-                    expenses.map(e => `
-                      <tr style="border-bottom:1px solid #f1f5f9;">
-                        <td style="padding:12px; color:#64748b;">${e.date ? e.date.split('T')[0] : '-'}</td>
-                        <td style="padding:12px; font-weight:600; color:#1e293b;">${e.description}</td>
-                        <td style="padding:12px;"><span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:600;">${e.category}</span></td>
-                        <td style="padding:12px; font-weight:700; color:#b45309;">${e.amount} ر.س</td>
-                        <td style="padding:12px; text-align:center;">
-                          <button onclick="window.deleteExpense('${e.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600;">حذف</button>
-                        </td>
-                      </tr>
-                    `).join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        `;
-
-        const dateInput = document.getElementById('tab-exp-date');
-        if (dateInput && !dateInput.value) {
-          dateInput.valueAsDate = new Date();
-        }
-
-        const activeContent = document.querySelector('main') || document.getElementById('root');
-        if (activeContent) {
-          const existingTabContent = activeContent.querySelector('.space-y-4') || activeContent.lastElementChild;
-          if (existingTabContent && activeExpensesTab) {
-            existingTabContent.innerHTML = '';
-            existingTabContent.appendChild(container);
-          }
-        }
-      };
-
-      window.submitTabExpense = async () => {
-        const amount = document.getElementById('tab-exp-amount').value;
-        const description = document.getElementById('tab-exp-desc').value;
-        const category = document.getElementById('tab-exp-cat').value;
-        const date = document.getElementById('tab-exp-date').value;
-        if (!amount || !description || !category) {
-          alert('يرجى تعبئة كافة الحقول المطلوبة للمصروف');
-          return;
-        }
-
-        const expenses = window.getLocalExpenses();
-        const newExpense = { id: Date.now(), amount, description, category, date: date || new Date().toISOString().split('T')[0] };
-        expenses.unshift(newExpense);
-        window.saveLocalExpenses(expenses);
-
-        try {
-          await fetch('/api/expenses', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(newExpense)
-          });
-        } catch (e) {}
-
-        alert('تمت إضافة المصروف بنجاح');
-        window.renderExpensesSection();
-      };
-
-      // تم إزالة الزر العائم بناءً على طلبك للاكتفاء ببطاقات الإحصائيات في شبكة النظام
-
-
-      // تنظيف القوائم المنسدلة وإزالة الخيار المكرر "سجل التدقيق والأمان" نهائياً لمنع أي تكرار
+      // 2. تنظيف القوائم المنسدلة وإزالة الخيار المكرر "سجل التدقيق والأمان" نهائياً
       setInterval(() => {
+        ensureFloatingExpensesButton();
+
         const allNodes = document.querySelectorAll('button, a, div, span');
         allNodes.forEach(el => {
           if (el.textContent && el.textContent.includes('سجل التدقيق والأمان') && el.closest('.absolute, .fixed, [role="menu"], div[style*="z-index"]')) {
             const container = el.closest('button, a, div[role="menuitem"], div') || el.parentElement;
             if (container && container.parentElement) {
-              // إزالة عنصر القائمة الخاص بسجل التدقيق والأمان لتجنب التكرار مع إعدادات المنشأة
               if (container.textContent && container.textContent.includes('سجل التدقيق والأمان') && container.textContent.length < 100) {
                 container.remove();
               }
             }
           }
         });
-      }, 300);
+      }, 400);
 
-      // ربط المصروفات مع لوحة القيادة والمؤشرات وحساب صافي الربح الفعلي كبطاقات قياسية ضمن شبكة الإحصائيات
+      // دالة لتحديد شبكة بطاقات الإحصائيات في منتصف لوحة التحكم بدقة تامة
+      function getDashboardStatsGrid() {
+        const allSpans = document.querySelectorAll('span, p, div');
+        for (const el of allSpans) {
+          // البحث عن بطاقة الأرباح الإجمالية بالاسم الدقيق
+          if (el.childNodes.length === 1 && el.textContent.trim() === 'الأرباح الإجمالية (Gross Profit)') {
+            const card = el.closest('.rounded-xl') || el.closest('[class*="rounded"]');
+            if (card) {
+              const grid = card.closest('.grid') || (card.parentElement && card.parentElement.classList.contains('grid') ? card.parentElement : null);
+              if (grid) {
+                return { grid, grossProfitCard: card };
+              }
+            }
+          }
+        }
+
+        // بحث احتياطي عبر بطاقة مبيعات اليوم
+        for (const el of allSpans) {
+          if (el.childNodes.length === 1 && el.textContent.trim() === 'مبيعات اليوم') {
+            const card = el.closest('.rounded-xl') || el.closest('[class*="rounded"]');
+            if (card) {
+              const grid = card.closest('.grid') || (card.parentElement && card.parentElement.classList.contains('grid') ? card.parentElement : null);
+              if (grid) {
+                return { grid, grossProfitCard: null };
+              }
+            }
+          }
+        }
+
+        return null;
+      }
+
+      // 3. ربط المصروفات مع شبكة الإحصائيات في منتصف لوحة القيادة وحذف أي بطاقات أسفل النظام
       setInterval(() => {
+        ensureFloatingExpensesButton();
+
+        // إزالة أي حاويات قديمة أو مكررة أسفل النظام
+        document.querySelectorAll('#store-expenses-container').forEach(el => el.remove());
+
+        const statsGridInfo = getDashboardStatsGrid();
+
+        // إزالة أي بطاقات إحصائيات للمصروفات أو صافي الربح متواجدة خارج شبكة الإحصائيات (مثل ظهورها أسفل الصفحة)
+        document.querySelectorAll('#injected-expenses-stat-card, #injected-net-profit-card').forEach(el => {
+          if (!statsGridInfo || el.parentElement !== statsGridInfo.grid) {
+            el.remove();
+          }
+        });
+
+        // إذا لم نكن في لوحة القيادة الحاوية لشبكة الإحصائيات، لا داعي للإضافة
+        if (!statsGridInfo || !statsGridInfo.grid) {
+          return;
+        }
+
         const expenses = window.getLocalExpenses();
         const now = new Date();
         const currentMonth = now.toISOString().slice(0, 7);
@@ -443,63 +402,73 @@
           .filter(e => e.date && e.date.startsWith(currentMonth))
           .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-        // البحث عن شبكة الإحصائيات التي تحتوي على بطاقة "الأرباح الإجمالية (Gross Profit)"
-        const allDivs = document.querySelectorAll('div');
-        let statsGrid = null;
+        // استخراج قيمة الأرباح الإجمالية من بطاقة النظام
         let grossProfitVal = 288.00;
-
-        for (const div of allDivs) {
-          if (div.textContent && div.textContent.includes('الأرباح الإجمالية (Gross Profit)') && div.parentElement) {
-            statsGrid = div.parentElement;
-            const text = div.textContent;
-            const match = text.match(/([\d,]+\.\d{2})/);
-            if (match) {
-              grossProfitVal = parseFloat(match[1].replace(/,/g, '')) || 288.00;
+        if (statsGridInfo.grossProfitCard) {
+          const cardText = statsGridInfo.grossProfitCard.textContent || '';
+          const match = cardText.match(/([\d,]+\.?\d*)\s*ر\.س/);
+          if (match) {
+            const parsed = parseFloat(match[1].replace(/,/g, ''));
+            if (!isNaN(parsed) && parsed > 0) grossProfitVal = parsed;
+          } else {
+            const valEl = statsGridInfo.grossProfitCard.querySelector('.text-2xl');
+            if (valEl) {
+              const num = parseFloat(valEl.textContent.replace(/[^\d.]/g, ''));
+              if (!isNaN(num) && num > 0) grossProfitVal = num;
             }
-            break;
           }
         }
 
+        // حساب صافي الربح الفعلي بعد خصم المصروفات
         const netProfitVal = grossProfitVal - monthExpensesTotal;
 
+        // 1. البوكس الأسود: مصروفات المحل والمؤسسة (الشهر)
         let expCard = document.getElementById('injected-expenses-stat-card');
-        let netCard = document.getElementById('injected-net-profit-card');
-
-        // إدراج البطاقات كعناصر قياسية داخل شبكة الإحصائيات (Stats Grid) لتظهر بجانب باقي بطاقات الصورة رقم 2
-        if (statsGrid) {
-          if (!expCard) {
-            expCard = document.createElement('div');
-            expCard.id = 'injected-expenses-stat-card';
-            // استخدام نفس تنسيق البطاقات الموجودة في الشبكة (اعتماد على flex-basis أو width متوافق)
-            expCard.style.cssText = 'background: #0f172a; color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; direction: rtl; min-height: 120px; flex: 1 1 200px;';
-            statsGrid.appendChild(expCard);
-          }
-          expCard.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 13px; color: #cbd5e1; font-weight: 700;">مصروفات المحل والمؤسسة (الشهر)</span>
-              <span style="font-size: 18px;">💰</span>
-            </div>
-            <div style="font-size: 22px; font-weight: 800; color: #f59e0b; margin: 10px 0;">${monthExpensesTotal.toFixed(2)} ر.س</div>
-            <div style="font-size: 11px; color: #94a3b8;">إجمالي مصاريف أجار المحل، الفواتير والرواتب للشهر الحالي</div>
-          `;
-
-          if (!netCard) {
-            netCard = document.createElement('div');
-            netCard.id = 'injected-net-profit-card';
-            // استخدام نفس تنسيق البطاقات الموجودة في الشبكة
-            netCard.style.cssText = 'background: linear-gradient(135deg, #065f46, #047857); color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; direction: rtl; min-height: 120px; flex: 1 1 200px;';
-            statsGrid.appendChild(netCard);
-          }
-          netCard.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 13px; color: #a7f3d0; font-weight: 700;">صافي الربح الفعلي (Net Profit)</span>
-              <span style="font-size: 18px;">📈</span>
-            </div>
-            <div style="font-size: 22px; font-weight: 800; color: #34d399; margin: 10px 0;">${netProfitVal.toFixed(2)} ر.س</div>
-            <div style="font-size: 11px; color: #a7f3d0;">الأرباح الإجمالية (${grossProfitVal.toFixed(2)}) - المصروفات (${monthExpensesTotal.toFixed(2)})</div>
-          `;
+        if (!expCard || expCard.parentElement !== statsGridInfo.grid) {
+          if (expCard) expCard.remove();
+          expCard = document.createElement('div');
+          expCard.id = 'injected-expenses-stat-card';
+          statsGridInfo.grid.appendChild(expCard);
         }
-      }, 1000);
+        expCard.className = 'p-4 rounded-xl border shadow-2xs transition-all bg-gradient-to-br from-slate-900 to-slate-950 text-white border-slate-800 hover:border-amber-400/50 cursor-pointer flex flex-col justify-between';
+        expCard.onclick = () => window.initExpensesUI();
+        expCard.title = 'انقر لتسجيل أو إدارة مصروفات المحل والمؤسسة';
+        expCard.innerHTML = `
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-amber-400">مصروفات المحل والمؤسسة (الشهر)</span>
+            <div class="p-1.5 rounded-lg bg-amber-400/20 text-amber-400 text-sm font-bold">💰</div>
+          </div>
+          <div class="text-2xl font-black font-mono text-amber-400 my-1">
+            ${monthExpensesTotal.toFixed(2)} <span class="text-xs font-bold text-amber-300">ر.س</span>
+          </div>
+          <div class="text-[11px] text-slate-400 font-semibold mt-1 flex items-center justify-between">
+            <span>إجمالي مصاريف أجار المحل، الفواتير والرواتب</span>
+            <span class="text-amber-400 text-[10px] underline hover:text-amber-300">تسجيل ➕</span>
+          </div>
+        `;
+
+        // 2. البوكس الأخضر: صافي الربح الفعلي (Net Profit)
+        let netCard = document.getElementById('injected-net-profit-card');
+        if (!netCard || netCard.parentElement !== statsGridInfo.grid) {
+          if (netCard) netCard.remove();
+          netCard = document.createElement('div');
+          netCard.id = 'injected-net-profit-card';
+          statsGridInfo.grid.appendChild(netCard);
+        }
+        netCard.className = 'p-4 rounded-xl border shadow-2xs transition-all bg-gradient-to-br from-emerald-900 to-emerald-950 text-white border-emerald-800 hover:border-emerald-400/50 flex flex-col justify-between';
+        netCard.innerHTML = `
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-emerald-300">صافي الربح الفعلي (Net Profit)</span>
+            <div class="p-1.5 rounded-lg bg-emerald-400/20 text-emerald-300 text-sm font-bold">📈</div>
+          </div>
+          <div class="text-2xl font-black font-mono text-emerald-300 my-1">
+            ${netProfitVal.toFixed(2)} <span class="text-xs font-bold text-emerald-200">ر.س</span>
+          </div>
+          <div class="text-[11px] text-emerald-200/90 font-semibold mt-1">
+            الأرباح الإجمالية (${grossProfitVal.toFixed(2)}) - المصروفات (${monthExpensesTotal.toFixed(2)})
+          </div>
+        `;
+      }, 500);
     </script>
   </body>
 </html>
