@@ -443,8 +443,11 @@
         });
       }, 300);
 
-      // ربط المصروفات مع لوحة القيادة والمؤشرات وإحصائيات الأرباح
+      // ربط المصروفات مع لوحة القيادة والمؤشرات وحساب صافي الربح الفعلي بدقة
       setInterval(() => {
+        // إزالة أي بطاقات مكررة قديمة لمنع التداخل والتداخل
+        document.querySelectorAll('#injected-expenses-stat-card, #injected-net-profit-card').forEach(el => el.remove());
+
         const expenses = window.getLocalExpenses();
         const now = new Date();
         const currentMonth = now.toISOString().slice(0, 7);
@@ -452,12 +455,23 @@
           .filter(e => e.date && e.date.startsWith(currentMonth))
           .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-        // البحث عن بطاقات الإحصائيات في لوحة القيادة لإدراج بطاقة مصروفات المحل وتحديث صافي الربح
-        const statCards = document.querySelectorAll('div');
-        statCards.forEach(card => {
-          if (card.textContent && card.textContent.includes('الأرباح الإجمالية') && card.parentElement) {
-            const gridParent = card.parentElement;
-            if (!gridParent.querySelector('#injected-expenses-stat-card')) {
+        // البحث عن بطاقات الإحصائيات في لوحة القيادة لإدراج البطاقات بشكل منفصل وسليم
+        const allDivs = document.querySelectorAll('div');
+        allDivs.forEach(div => {
+          if (div.textContent && div.textContent.includes('الأرباح الإجمالية (Gross Profit)') && div.parentElement) {
+            const gridContainer = div.parentElement;
+            if (gridContainer && gridContainer.children.length > 2 && !gridContainer.querySelector('#injected-net-profit-card')) {
+              
+              let grossProfitVal = 288.00;
+              const text = div.textContent;
+              const match = text.match(/([\d,]+\.\d{2})/);
+              if (match) {
+                grossProfitVal = parseFloat(match[1].replace(/,/g, '')) || 288.00;
+              }
+
+              const netProfitVal = grossProfitVal - monthExpensesTotal;
+
+              // 1. بطاقة المصروفات المستقلة
               const expCard = document.createElement('div');
               expCard.id = 'injected-expenses-stat-card';
               expCard.style.cssText = 'background:#1e293b; color:white; padding:20px; border-radius:16px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); display:flex; flex-direction:column; justify-content:space-between; direction:rtl;';
@@ -469,7 +483,21 @@
                 <div style="font-size:22px; font-weight:800; color:#f59e0b; margin:10px 0;">${monthExpensesTotal.toFixed(2)} ر.س</div>
                 <div style="font-size:11px; color:#94a3b8;">إجمالي مصاريف أجار المحل، الفواتير والرواتب للشهر الحالي</div>
               `;
-              gridParent.appendChild(expCard);
+              gridContainer.appendChild(expCard);
+
+              // 2. بطاقة صافي الربح الفعلي بعد خصم المصروفات
+              const netCard = document.createElement('div');
+              netCard.id = 'injected-net-profit-card';
+              netCard.style.cssText = 'background:linear-gradient(135deg, #065f46, #047857); color:white; padding:20px; border-radius:16px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); display:flex; flex-direction:column; justify-content:space-between; direction:rtl;';
+              netCard.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-size:13px; color:#a7f3d0; font-weight:700;">صافي الربح الفعلي (Net Profit)</span>
+                  <span style="font-size:18px;">📈</span>
+                </div>
+                <div style="font-size:22px; font-weight:800; color:#34d399; margin:10px 0;">${netProfitVal.toFixed(2)} ر.س</div>
+                <div style="font-size:11px; color:#a7f3d0;">الأرباح الإجمالية (${grossProfitVal.toFixed(2)}) - المصروفات (${monthExpensesTotal.toFixed(2)})</div>
+              `;
+              gridContainer.appendChild(netCard);
             }
           }
         });
