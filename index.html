@@ -421,7 +421,7 @@
         floatBtn.id = 'floating-expenses-btn';
         floatBtn.innerHTML = '<span>💰</span><span>مصروفات المحل والمؤسسة</span>';
         floatBtn.onclick = window.initExpensesUI;
-        floatBtn.style.cssText = 'position:fixed; bottom:25px; right:25px; z-index:99999999; background:linear-gradient(135deg, #0f172a, #1e293b); color:white; padding:14px 22px; border-radius:35px; box-shadow:0 10px 30px rgba(15, 23, 42, 0.6); border:2.5px solid #f59e0b; font-family:inherit; font-weight:800; font-size:14px; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.2s;';
+        floatBtn.style.cssText = 'position:fixed; bottom:80px; right:25px; z-index:99999999; background:linear-gradient(135deg, #0f172a, #1e293b); color:white; padding:14px 22px; border-radius:35px; box-shadow:0 10px 30px rgba(15, 23, 42, 0.6); border:2.5px solid #f59e0b; font-family:inherit; font-weight:800; font-size:14px; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.2s;';
         floatBtn.onmouseover = () => floatBtn.style.transform = 'scale(1.08)';
         floatBtn.onmouseout = () => floatBtn.style.transform = 'scale(1)';
         document.body.appendChild(floatBtn);
