@@ -373,25 +373,8 @@
         window.renderExpensesSection();
       };
 
-      // مراقب DOM فائق الدقة لإدراج زر "مصروفات المؤسسة" بجانب تبويب "لوحة القيادة والمؤشرات" وفي الزر العائم
+      // مراقب DOM لإضافة تبويب "مصروفات المحل" بجانب "سجل فواتير الآجل" في قسم العملاء والذمم فقط
       setInterval(() => {
-        // 1. البحث عن زر "لوحة القيادة والمؤشرات" في شريط التنقل الرئيسي لإدراج زر المصروفات بجانبه مباشرة
-        const allEls = document.querySelectorAll('button, div, span, a');
-        allEls.forEach(el => {
-          if (el.textContent && el.textContent.trim() === 'لوحة القيادة والمؤشرات' && el.parentElement) {
-            const parent = el.parentElement;
-            if (!parent.querySelector('#injected-expenses-nav-btn')) {
-              const btn = document.createElement('button');
-              btn.id = 'injected-expenses-nav-btn';
-              btn.innerHTML = '💰 مصروفات المؤسسة';
-              btn.style.cssText = 'background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-family: inherit; font-size: 13px; margin-right: 8px; box-shadow: 0 2px 6px rgba(245,158,11,0.4); display: inline-flex; align-items:center; gap:5px; z-index:99999;';
-              btn.onclick = window.initExpensesUI;
-              parent.insertBefore(btn, el.nextSibling);
-            }
-          }
-        });
-
-        // 2. البحث عن تبويب "سجل فواتير الآجل" في العملاء والذمم لإضافة "مصروفات المحل"
         const buttons = document.querySelectorAll('button, div, span');
         buttons.forEach(el => {
           if (el.textContent && (el.textContent.includes('سجل فواتير الآجل') || el.textContent.includes('العملاء والذمم')) && el.parentElement) {
@@ -416,7 +399,7 @@
         });
       }, 500);
 
-      // إضافة زر عائم فائق الوضوح في أسفل الشاشة (يمين) - تم إزالة الزر العلوي نهائياً بناءً على طلبك
+      // إضافة زر عائم فائق الوضوح في أسفل الشاشة (يمين) - الزر الوحيد المعروض على سطح المكتب والجوال
       if (!document.getElementById('floating-expenses-btn')) {
         const floatBtn = document.createElement('button');
         floatBtn.id = 'floating-expenses-btn';
