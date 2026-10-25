@@ -1228,6 +1228,21 @@ app.post('/api/expenses', (req: Request, res: Response) => {
   }
 });
 
+app.post('/api/expenses/delete', (req: Request, res: Response) => {
+  try {
+    const { id } = req.body;
+    if (!id) {
+      return res.status(400).json({ success: false, error: 'رقم المصروف مطلوب' });
+    }
+    const data = JSON.parse(fs.readFileSync(EXPENSES_DATA_FILE, 'utf-8'));
+    data.expenses = data.expenses.filter((e: any) => e.id !== Number(id) && e.id !== id);
+    fs.writeFileSync(EXPENSES_DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    res.json({ success: true, message: 'تم حذف المصروف بنجاح' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'تعذر حذف المصروف' });
+  }
+});
+
 // مسار حماية يضمن عدم انزلاق أي طلب برمجيات /api/* إلى واجهة HTML في حال عدم التطابق
 app.all('/api/*', (req: Request, res: Response) => {
   res.status(404).json({
