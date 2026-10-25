@@ -415,17 +415,8 @@
         window.renderExpensesSection();
       };
 
-      // إضافة زر عائم فائق الوضوح في أسفل الشاشة (يمين) - وهو الزر الوحيد المعتمد للوصول للمصروفات
-      if (!document.getElementById('floating-expenses-btn')) {
-        const floatBtn = document.createElement('button');
-        floatBtn.id = 'floating-expenses-btn';
-        floatBtn.innerHTML = '<span>💰</span><span>مصروفات المحل والمؤسسة</span>';
-        floatBtn.onclick = window.initExpensesUI;
-        floatBtn.style.cssText = 'position:fixed; bottom:80px; right:25px; z-index:99999999; background:linear-gradient(135deg, #0f172a, #1e293b); color:white; padding:14px 22px; border-radius:35px; box-shadow:0 10px 30px rgba(15, 23, 42, 0.6); border:2.5px solid #f59e0b; font-family:inherit; font-weight:800; font-size:14px; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.2s;';
-        floatBtn.onmouseover = () => floatBtn.style.transform = 'scale(1.08)';
-        floatBtn.onmouseout = () => floatBtn.style.transform = 'scale(1)';
-        document.body.appendChild(floatBtn);
-      }
+      // تم إزالة الزر العائم بناءً على طلبك للاكتفاء ببطاقات الإحصائيات في شبكة النظام
+
 
       // تنظيف القوائم المنسدلة وإزالة الخيار المكرر "سجل التدقيق والأمان" نهائياً لمنع أي تكرار
       setInterval(() => {
@@ -479,7 +470,8 @@
           if (!expCard) {
             expCard = document.createElement('div');
             expCard.id = 'injected-expenses-stat-card';
-            expCard.style.cssText = 'background: #0f172a; color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; direction: rtl; min-height: 120px;';
+            // استخدام نفس تنسيق البطاقات الموجودة في الشبكة (اعتماد على flex-basis أو width متوافق)
+            expCard.style.cssText = 'background: #0f172a; color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; direction: rtl; min-height: 120px; flex: 1 1 200px;';
             statsGrid.appendChild(expCard);
           }
           expCard.innerHTML = `
@@ -494,7 +486,8 @@
           if (!netCard) {
             netCard = document.createElement('div');
             netCard.id = 'injected-net-profit-card';
-            netCard.style.cssText = 'background: linear-gradient(135deg, #065f46, #047857); color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; direction: rtl; min-height: 120px;';
+            // استخدام نفس تنسيق البطاقات الموجودة في الشبكة
+            netCard.style.cssText = 'background: linear-gradient(135deg, #065f46, #047857); color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; direction: rtl; min-height: 120px; flex: 1 1 200px;';
             statsGrid.appendChild(netCard);
           }
           netCard.innerHTML = `
