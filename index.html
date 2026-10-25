@@ -162,13 +162,36 @@
         window.loadExpensesModalData();
       };
 
-      window.loadExpensesModalData = async () => {
+      window.getLocalExpenses = () => {
+        try {
+          const stored = localStorage.getItem('emadco_store_expenses');
+          return stored ? JSON.parse(stored) : [];
+        } catch (e) {
+          return [];
+        }
+      };
+
+      window.saveLocalExpenses = (expenses) => {
+        try {
+          localStorage.setItem('emadco_store_expenses', JSON.stringify(expenses));
+        } catch (e) {}
+      };
+
+      window.getExpenses = async () => {
         try {
           const res = await fetch('/api/expenses');
           const data = await res.json();
-          const expenses = data.expenses || [];
+          if (data && data.success && Array.isArray(data.expenses) && data.expenses.length > 0) {
+            window.saveLocalExpenses(data.expenses);
+            return data.expenses;
+          }
+        } catch (e) {}
+        return window.getLocalExpenses();
+      };
 
-          // فرز المصروفات حسب التاريخ من الأحدث للأقدم
+      window.loadExpensesModalData = async () => {
+        try {
+          const expenses = await window.getExpenses();
           expenses.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 
           const now = new Date();
@@ -223,11 +246,18 @@
           return;
         }
 
-        await fetch('/api/expenses', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ amount, description, category, date })
-        });
+        const expenses = window.getLocalExpenses();
+        const newExpense = { id: Date.now(), amount, description, category, date: date || new Date().toISOString().split('T')[0] };
+        expenses.unshift(newExpense);
+        window.saveLocalExpenses(expenses);
+
+        try {
+          await fetch('/api/expenses', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(newExpense)
+          });
+        } catch (e) {}
 
         document.getElementById('modal-exp-amount').value = '';
         document.getElementById('modal-exp-desc').value = '';
@@ -243,11 +273,18 @@
 
       window.deleteExpense = async (id) => {
         if (!confirm('هل أنت متأكد من حذف هذا المصروف؟')) return;
-        await fetch('/api/expenses/delete', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ id })
-        });
+        let expenses = window.getLocalExpenses();
+        expenses = expenses.filter(e => String(e.id) !== String(id));
+        window.saveLocalExpenses(expenses);
+
+        try {
+          await fetch('/api/expenses/delete', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ id })
+          });
+        } catch (e) {}
+
         window.loadExpensesModalData();
         if (typeof window.renderExpensesSection === 'function') {
           window.renderExpensesSection();
@@ -262,11 +299,7 @@
           container.style.cssText = 'background:white; padding:24px; border-radius:16px; margin-top:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); direction:rtl;';
         }
         
-        const res = await fetch('/api/expenses');
-        const data = await res.json();
-        const expenses = data.expenses || [];
-
-        // فرز المصروفات حسب التاريخ من الأحدث للأقدم
+        const expenses = await window.getExpenses();
         expenses.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 
         const now = new Date();
@@ -364,42 +397,25 @@
           alert('يرجى تعبئة كافة الحقول المطلوبة للمصروف');
           return;
         }
-        await fetch('/api/expenses', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ amount, description, category, date })
-        });
+
+        const expenses = window.getLocalExpenses();
+        const newExpense = { id: Date.now(), amount, description, category, date: date || new Date().toISOString().split('T')[0] };
+        expenses.unshift(newExpense);
+        window.saveLocalExpenses(expenses);
+
+        try {
+          await fetch('/api/expenses', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(newExpense)
+          });
+        } catch (e) {}
+
         alert('تمت إضافة المصروف بنجاح');
         window.renderExpensesSection();
       };
 
-      // مراقب DOM لإضافة تبويب "مصروفات المحل" بجانب "سجل فواتير الآجل" في قسم العملاء والذمم فقط
-      setInterval(() => {
-        const buttons = document.querySelectorAll('button, div, span');
-        buttons.forEach(el => {
-          if (el.textContent && (el.textContent.includes('سجل فواتير الآجل') || el.textContent.includes('العملاء والذمم')) && el.parentElement) {
-            const parent = el.parentElement;
-            if (!parent.querySelector('#custom-expenses-tab')) {
-              const myTab = document.createElement('button');
-              myTab.id = 'custom-expenses-tab';
-              myTab.innerText = 'مصروفات المحل';
-              myTab.style.cssText = 'padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; background: white; border: 1px solid #cbd5e1; color: #334155; margin-right: 8px; font-family: inherit; font-size: 13px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);';
-              myTab.onclick = () => {
-                activeExpensesTab = true;
-                parent.querySelectorAll('button').forEach(b => {
-                  if (b !== myTab) b.style.background = 'white';
-                });
-                myTab.style.background = '#0f172a';
-                myTab.style.color = 'white';
-                window.renderExpensesSection();
-              };
-              parent.appendChild(myTab);
-            }
-          }
-        });
-      }, 500);
-
-      // إضافة زر عائم فائق الوضوح في أسفل الشاشة (يمين) - الزر الوحيد المعروض على سطح المكتب والجوال
+      // إضافة زر عائم فائق الوضوح في أسفل الشاشة (يمين) - وهو الزر الوحيد المعتمد للوصول للمصروفات
       if (!document.getElementById('floating-expenses-btn')) {
         const floatBtn = document.createElement('button');
         floatBtn.id = 'floating-expenses-btn';
