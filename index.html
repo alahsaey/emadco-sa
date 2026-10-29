@@ -349,28 +349,17 @@
         position: absolute;
         top: calc(100% + 8px);
         right: 0;
-        min-width: 285px;
-        max-width: 330px;
+        min-width: 290px;
+        max-width: 340px;
         width: max-content;
         background: #ffffff;
         border-radius: 16px;
         border: 1.5px solid #e2e8f0;
-        box-shadow: 0 20px 45px -8px rgba(15, 23, 42, 0.25), 0 8px 20px -4px rgba(15, 23, 42, 0.1);
+        box-shadow: 0 20px 45px -8px rgba(15, 23, 42, 0.22), 0 8px 20px -4px rgba(15, 23, 42, 0.08);
         padding: 8px;
         z-index: 999999;
         direction: rtl;
-        transform-origin: top right;
-        animation: emadcoDropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      }
-      @keyframes emadcoDropdownFadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(-6px) scale(0.97);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
+        box-sizing: border-box;
       }
       .emadco-dropdown-header {
         display: flex;
@@ -874,8 +863,17 @@
         }
       ];
 
-      window.activeDropdownHubId = null;
       let isHubEventsBound = false;
+      let lastTrackedActiveLabel = '';
+
+      function closeAllHubDropdowns() {
+        document.querySelectorAll('.emadco-dropdown-panel').forEach(p => {
+          p.style.display = 'none';
+        });
+        document.querySelectorAll('.emadco-hub-arrow').forEach(a => {
+          a.style.transform = 'rotate(0deg)';
+        });
+      }
 
       function triggerRawNavAction(targetLabel) {
         const navBar = document.getElementById('main-app-nav-toolbar');
@@ -928,14 +926,11 @@
         navBar.style.boxShadow = 'none';
         navBar.style.padding = '0';
 
-        // إضافة ترويسة البوابات الأنيقة
+        // إضافة ترويسة البوابات الأنيقة مرة واحدة
         let toolbarHeader = document.getElementById('nav-toolbar-header-bar');
         if (!toolbarHeader && navBar.parentElement) {
           toolbarHeader = document.createElement('div');
           toolbarHeader.id = 'nav-toolbar-header-bar';
-          navBar.parentElement.insertBefore(toolbarHeader, navBar);
-        }
-        if (toolbarHeader) {
           toolbarHeader.style.cssText = 'display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 2px 6px; direction: rtl;';
           toolbarHeader.innerHTML = `
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -947,6 +942,7 @@
               قوائم منسدلة سريعة • بدون تمرير أفقي
             </div>
           `;
+          navBar.parentElement.insertBefore(toolbarHeader, navBar);
         }
 
         // إخفاء الأزرار الأصلية القديمة (13 زر) مع الاحتفاظ بها للتنقل
@@ -978,83 +974,34 @@
           activeRawLabel = 'لوحة القيادة والمؤشرات';
         }
 
-        // إنشاء أو تحديث حاوية البوابات الأربع
+        // بناء حاوية البوابات الأربع مرة واحدة فقط في الـ DOM لمنع أي رمش أو اهتزاز
         let hubsGrid = document.getElementById('emadco-4hubs-bar');
-        if (!hubsGrid) {
+        const isFirstBuild = !hubsGrid;
+
+        if (isFirstBuild) {
           hubsGrid = document.createElement('div');
           hubsGrid.id = 'emadco-4hubs-bar';
           hubsGrid.className = 'emadco-hubs-grid';
           navBar.appendChild(hubsGrid);
-        }
 
-        // بناء بطاقات البوابات الأربع
-        HUBS_CONFIG.forEach(hub => {
-          let hubWrapper = document.getElementById(`hub-wrapper-${hub.id}`);
-          if (!hubWrapper) {
-            hubWrapper = document.createElement('div');
+          HUBS_CONFIG.forEach(hub => {
+            const hubWrapper = document.createElement('div');
             hubWrapper.id = `hub-wrapper-${hub.id}`;
             hubWrapper.className = 'emadco-hub-wrapper';
-            hubsGrid.appendChild(hubWrapper);
-          }
 
-          // فحص هل هذه البوابة أو أحد أبنائها نشط
-          let isHubActive = false;
-          let activeSubLabel = '';
-
-          if (hub.id === 'dashboard') {
-            isHubActive = activeRawLabel.includes('لوحة القيادة');
-          } else if (hub.items) {
-            for (const item of hub.items) {
-              if (activeRawLabel.includes(item.targetLabel) || item.targetLabel.includes(activeRawLabel)) {
-                isHubActive = true;
-                activeSubLabel = item.label;
-                break;
-              }
-            }
-          }
-
-          const isOpen = (window.activeDropdownHubId === hub.id);
-
-          // محتوى زر البوابة
-          hubWrapper.innerHTML = `
-            <button
-              type="button"
-              id="hub-btn-${hub.id}"
-              class="emadco-hub-btn ${isHubActive ? 'active' : 'inactive'}"
-              title="${hub.label}"
-            >
-              <div style="display: flex; align-items: center; gap: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                <div class="emadco-hub-badge" style="background: ${isHubActive ? 'rgba(255,255,255,0.15)' : hub.badgeBg}; color: ${isHubActive ? '#fbbf24' : hub.badgeColor}; border: 1px solid ${isHubActive ? 'rgba(255,255,255,0.25)' : hub.badgeBorder};">
-                  ${hub.iconSvg}
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: right; line-height: 1.2;">
-                  <span style="font-size: 13.5px; font-weight: 800; color: ${isHubActive ? '#ffffff' : '#0f172a'};">${hub.label}</span>
-                  ${activeSubLabel ? `<span style="font-size: 10.5px; font-weight: 700; color: #34d399; margin-top: 2px;">• ${activeSubLabel}</span>` : ''}
-                </div>
-              </div>
-              ${hub.isDropdown ? `
-                <div style="display: flex; align-items: center; gap: 4px; margin-right: 6px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: ${isHubActive ? '#94a3b8' : '#64748b'}; transform: ${isOpen ? 'rotate(180deg)' : 'rotate(0)'}; transition: transform 0.2s ease;">
-                    <polyline points="6 9 12 15 18 9"/>
-                  </svg>
-                </div>
-              ` : `
-                ${isHubActive ? `<div style="width: 8px; height: 8px; border-radius: 999px; background: #fbbf24; box-shadow: 0 0 8px #fbbf24;"></div>` : ''}
-              `}
-            </button>
-
-            ${hub.isDropdown && isOpen ? `
-              <div class="emadco-dropdown-panel" id="dropdown-panel-${hub.id}">
-                <div class="emadco-dropdown-header">
-                  <span style="font-size: 12px; font-weight: 800; color: #0f172a;">${hub.dropdownTitle}</span>
-                  <span style="font-size: 10.5px; font-weight: 700; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 999px;">${hub.dropdownBadge}</span>
-                </div>
-                <div style="display: flex; flex-direction: column;">
-                  ${hub.items.map(item => {
-                    const isItemActive = activeRawLabel.includes(item.targetLabel) || item.targetLabel.includes(activeRawLabel);
-                    return `
+            let dropdownHtml = '';
+            if (hub.isDropdown && hub.items) {
+              dropdownHtml = `
+                <div class="emadco-dropdown-panel" id="dropdown-panel-${hub.id}" style="display: none;">
+                  <div class="emadco-dropdown-header">
+                    <span style="font-size: 12px; font-weight: 800; color: #0f172a;">${hub.dropdownTitle}</span>
+                    <span style="font-size: 10.5px; font-weight: 700; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 999px;">${hub.dropdownBadge}</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column;">
+                    ${hub.items.map(item => `
                       <div
-                        class="emadco-dropdown-item ${isItemActive ? 'active-item' : ''}"
+                        class="emadco-dropdown-item"
+                        id="dropdown-item-${hub.id}-${item.id}"
                         data-target="${item.targetLabel}"
                         title="${item.label} - ${item.sub}"
                       >
@@ -1063,71 +1010,166 @@
                             ${item.iconSvg}
                           </div>
                           <div style="display: flex; flex-direction: column; text-align: right; line-height: 1.25;">
-                            <span style="font-size: 12.5px; font-weight: 800; color: ${isItemActive ? '#15803d' : '#1e293b'};">${item.label}</span>
+                            <span class="dropdown-item-title" style="font-size: 12.5px; font-weight: 800; color: #1e293b;">${item.label}</span>
                             <span style="font-size: 10.5px; font-weight: 500; color: #64748b; margin-top: 1px;">${item.sub}</span>
                           </div>
                         </div>
-                        <div style="font-size: 12px; color: ${isItemActive ? '#16a34a' : '#cbd5e1'}; font-weight: 800;">
-                          ${isItemActive ? '✓' : '‹'}
+                        <div class="dropdown-item-indicator" style="font-size: 12px; color: #cbd5e1; font-weight: 800;">
+                          ‹
                         </div>
                       </div>
-                    `;
-                  }).join('')}
+                    `).join('')}
+                  </div>
                 </div>
-              </div>
-            ` : ''}
-          `;
+              `;
+            }
 
-          // ربط حدث النقر على زر البوابة
-          const hubBtn = hubWrapper.querySelector(`#hub-btn-${hub.id}`);
-          if (hubBtn) {
-            hubBtn.onclick = (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (hub.id === 'dashboard') {
-                window.activeDropdownHubId = null;
-                triggerRawNavAction(hub.targetLabel);
-                enhanceNavigationToolbar();
-              } else {
-                window.activeDropdownHubId = (window.activeDropdownHubId === hub.id) ? null : hub.id;
-                enhanceNavigationToolbar();
-              }
-            };
-          }
+            hubWrapper.innerHTML = `
+              <button
+                type="button"
+                id="hub-btn-${hub.id}"
+                class="emadco-hub-btn inactive"
+                title="${hub.label}"
+              >
+                <div style="display: flex; align-items: center; gap: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <div class="emadco-hub-badge" id="hub-badge-${hub.id}" style="background: ${hub.badgeBg}; color: ${hub.badgeColor}; border: 1px solid ${hub.badgeBorder};">
+                    ${hub.iconSvg}
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: right; line-height: 1.2;">
+                    <span class="hub-title-span" style="font-size: 13.5px; font-weight: 800; color: #0f172a;">${hub.label}</span>
+                    <span class="hub-sub-span" id="hub-sub-${hub.id}" style="font-size: 10.5px; font-weight: 700; color: #34d399; margin-top: 2px; display: none;"></span>
+                  </div>
+                </div>
+                ${hub.isDropdown ? `
+                  <div style="display: flex; align-items: center; gap: 4px; margin-right: 6px;">
+                    <svg class="emadco-hub-arrow" id="hub-arrow-${hub.id}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: #64748b; transition: transform 0.2s ease;">
+                      <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                  </div>
+                ` : `
+                  <div class="hub-dot" id="hub-dot-${hub.id}" style="width: 8px; height: 8px; border-radius: 999px; background: #fbbf24; box-shadow: 0 0 8px #fbbf24; display: none;"></div>
+                `}
+              </button>
+              ${dropdownHtml}
+            `;
 
-          // ربط حدث النقر على بنود القائمة المنسدلة
-          if (hub.isDropdown && isOpen) {
-            const dropdownPanel = hubWrapper.querySelector(`#dropdown-panel-${hub.id}`);
-            if (dropdownPanel) {
-              dropdownPanel.querySelectorAll('.emadco-dropdown-item').forEach(itemEl => {
-                itemEl.onclick = (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const targetLabel = itemEl.getAttribute('data-target');
-                  window.activeDropdownHubId = null;
-                  triggerRawNavAction(targetLabel);
-                  enhanceNavigationToolbar();
-                };
+            hubsGrid.appendChild(hubWrapper);
+
+            // ربط حدث النقر على زر البوابة مرة واحدة
+            const btnEl = hubWrapper.querySelector(`#hub-btn-${hub.id}`);
+            if (btnEl) {
+              btnEl.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (hub.id === 'dashboard') {
+                  closeAllHubDropdowns();
+                  triggerRawNavAction(hub.targetLabel);
+                } else {
+                  const panel = document.getElementById(`dropdown-panel-${hub.id}`);
+                  const arrow = document.getElementById(`hub-arrow-${hub.id}`);
+                  const isCurrentlyOpen = (panel && panel.style.display === 'block');
+                  closeAllHubDropdowns();
+                  if (!isCurrentlyOpen && panel) {
+                    panel.style.display = 'block';
+                    if (arrow) arrow.style.transform = 'rotate(180deg)';
+                  }
+                }
+              };
+            }
+
+            // ربط حدث النقر على عناصر القائمة المنسدلة مرة واحدة
+            if (hub.isDropdown && hub.items) {
+              hub.items.forEach(item => {
+                const itemEl = hubWrapper.querySelector(`#dropdown-item-${hub.id}-${item.id}`);
+                if (itemEl) {
+                  itemEl.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeAllHubDropdowns();
+                    triggerRawNavAction(item.targetLabel);
+                  };
+                }
               });
             }
-          }
-        });
+          });
+        }
 
-        // ربط مستمع الإغلاق عند النقر بالخارج أو الضغط على زر ESC
+        // تحديث الحالات النشطة فقط إذا تغيرت الشاشة (بدون إعادة بناء الـ DOM مطلقاً)
+        if (activeRawLabel !== lastTrackedActiveLabel || isFirstBuild) {
+          lastTrackedActiveLabel = activeRawLabel;
+
+          HUBS_CONFIG.forEach(hub => {
+            const hubBtn = document.getElementById(`hub-btn-${hub.id}`);
+            const hubBadge = document.getElementById(`hub-badge-${hub.id}`);
+            const hubTitle = hubBtn ? hubBtn.querySelector('.hub-title-span') : null;
+            const hubSub = document.getElementById(`hub-sub-${hub.id}`);
+            const hubDot = document.getElementById(`hub-dot-${hub.id}`);
+
+            let isHubActive = false;
+            let activeSubLabel = '';
+
+            if (hub.id === 'dashboard') {
+              isHubActive = activeRawLabel.includes('لوحة القيادة');
+            } else if (hub.items) {
+              for (const item of hub.items) {
+                if (activeRawLabel.includes(item.targetLabel) || item.targetLabel.includes(activeRawLabel)) {
+                  isHubActive = true;
+                  activeSubLabel = item.label;
+                  break;
+                }
+              }
+            }
+
+            if (hubBtn) {
+              hubBtn.className = 'emadco-hub-btn ' + (isHubActive ? 'active' : 'inactive');
+            }
+            if (hubBadge) {
+              hubBadge.style.background = isHubActive ? 'rgba(255,255,255,0.15)' : hub.badgeBg;
+              hubBadge.style.color = isHubActive ? '#fbbf24' : hub.badgeColor;
+              hubBadge.style.borderColor = isHubActive ? 'rgba(255,255,255,0.25)' : hub.badgeBorder;
+            }
+            if (hubTitle) {
+              hubTitle.style.color = isHubActive ? '#ffffff' : '#0f172a';
+            }
+            if (hubSub) {
+              hubSub.textContent = activeSubLabel ? '• ' + activeSubLabel : '';
+              hubSub.style.display = activeSubLabel ? 'inline' : 'none';
+            }
+            if (hubDot) {
+              hubDot.style.display = isHubActive ? 'block' : 'none';
+            }
+
+            // تحديث تمييز العنصر النشط داخل القائمة المنسدلة
+            if (hub.items) {
+              hub.items.forEach(item => {
+                const itemEl = document.getElementById(`dropdown-item-${hub.id}-${item.id}`);
+                if (itemEl) {
+                  const isItemActive = activeRawLabel.includes(item.targetLabel) || item.targetLabel.includes(activeRawLabel);
+                  itemEl.classList.toggle('active-item', isItemActive);
+                  const titleSpan = itemEl.querySelector('.dropdown-item-title');
+                  if (titleSpan) titleSpan.style.color = isItemActive ? '#15803d' : '#1e293b';
+                  const ind = itemEl.querySelector('.dropdown-item-indicator');
+                  if (ind) {
+                    ind.textContent = isItemActive ? '✓' : '‹';
+                    ind.style.color = isItemActive ? '#16a34a' : '#cbd5e1';
+                  }
+                }
+              });
+            }
+          });
+        }
+
+        // ربط مستمع الإغلاق عند النقر بالخارج أو الضغط على زر ESC مرة واحدة فقط
         if (!isHubEventsBound) {
           isHubEventsBound = true;
           document.addEventListener('click', (e) => {
             if (!e.target.closest('.emadco-hub-wrapper')) {
-              if (window.activeDropdownHubId !== null) {
-                window.activeDropdownHubId = null;
-                enhanceNavigationToolbar();
-              }
+              closeAllHubDropdowns();
             }
           });
           document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && window.activeDropdownHubId !== null) {
-              window.activeDropdownHubId = null;
-              enhanceNavigationToolbar();
+            if (e.key === 'Escape') {
+              closeAllHubDropdowns();
             }
           });
         }
