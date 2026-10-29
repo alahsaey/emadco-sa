@@ -691,28 +691,44 @@
         }
       };
 
-      // إخفاء زر "استعلام وطباعة الفواتير" من شريط أقسام النظام المحاسبي العلوي وضبط التوزيع المتناسق
-      function cleanTopInvoiceLookupButton() {
-        const allButtons = document.querySelectorAll('button');
-        allButtons.forEach(btn => {
-          if (btn.classList.contains('emadco-dropdown-item') || btn.closest('.emadco-dropdown-panel')) {
-            return;
-          }
-          const txt = (btn.textContent || '').trim();
-          if (txt.includes('استعلام وطباعة الفواتير')) {
-            const container = btn.closest('div.grid');
-            if (container) {
-              btn.style.setProperty('display', 'none', 'important');
-              container.style.gridTemplateColumns = 'repeat(5, minmax(0, 1fr))';
+      // إخفاء الأزرار المكررة بالأسفل من شريط أقسام النظام المحاسبي العلوي (مثل نقاط البيع، لوحة القيادة، ZATCA، واستعلام الفواتير)
+      function cleanTopAccountingBar() {
+        const allGrids = document.querySelectorAll('div.grid');
+        allGrids.forEach(grid => {
+          const prevHeader = grid.previousElementSibling;
+          const isAccountingBar = prevHeader && prevHeader.textContent && prevHeader.textContent.includes('أقسام النظام المحاسبي والفواتير');
+          if (isAccountingBar) {
+            const buttons = Array.from(grid.querySelectorAll('button'));
+            let visibleCount = 0;
+            buttons.forEach(btn => {
+              const txt = (btn.textContent || '').trim();
+              if (
+                txt.includes('نقطة البيع') ||
+                txt.includes('لوحة القيادة') ||
+                txt.includes('الفوترة ZATCA') ||
+                txt.includes('ZATCA') ||
+                txt.includes('استعلام وطباعة الفواتير')
+              ) {
+                btn.style.setProperty('display', 'none', 'important');
+              } else {
+                btn.style.removeProperty('display');
+                visibleCount++;
+              }
+            });
+            if (visibleCount > 0) {
+              grid.style.gridTemplateColumns = `repeat(${visibleCount}, minmax(0, 1fr))`;
             }
           }
         });
 
-        // تعديل شارة الترويسة في الشريط العلوي لحذف النص المكرر
+        // تعديل شارة الترويسة في الشريط العلوي لتشمل فقط الأقسام المتبقية
         const allSpans = document.querySelectorAll('span');
         allSpans.forEach(sp => {
-          if (sp.textContent && sp.textContent.includes('تشمل استعلام الفواتير،')) {
-            sp.textContent = sp.textContent.replace('استعلام الفواتير، ', '');
+          if (sp.textContent && sp.textContent.includes('تشمل')) {
+            const container = sp.closest('div');
+            if (container && container.textContent.includes('أقسام النظام المحاسبي والفواتير')) {
+              sp.textContent = 'تشمل عروض الأسعار والتقارير المحاسبية';
+            }
           }
         });
       }
@@ -720,7 +736,7 @@
       // 2. تنظيف القوائم المنسدلة وإزالة الخيارات المكررة
       setInterval(() => {
         ensureFloatingExpensesButton();
-        cleanTopInvoiceLookupButton();
+        cleanTopAccountingBar();
         enhanceNavigationToolbar();
 
         const allNodes = document.querySelectorAll('button, a, div, span');
@@ -870,8 +886,8 @@
           id: 'admin',
           label: 'الإدارة والرقابة',
           isDropdown: true,
-          dropdownTitle: 'بوابة الحوكمة وصلاحيات المستخدمين',
-          dropdownBadge: 'قسمان',
+          dropdownTitle: 'بوابة الحوكمة، الرقابة والامتثال الضريبي',
+          dropdownBadge: '3 أقسام',
           badgeBg: 'linear-gradient(135deg, #f1f5f9, #e2e8f0)',
           badgeColor: '#334155',
           badgeBorder: '#cbd5e1',
@@ -894,6 +910,15 @@
               iconBg: '#f8fafc',
               iconColor: '#475569',
               iconSvg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`
+            },
+            {
+              id: 'zatca',
+              label: 'الفوترة الإلكترونية (ZATCA)',
+              sub: 'شهادات CSID، الربط والتكامل والامتثال الضريبي',
+              targetLabel: 'الفوترة ZATCA',
+              iconBg: '#ecfdf5',
+              iconColor: '#059669',
+              iconSvg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><polyline points="9 12 11 14 15 10"/></svg>`
             }
           ]
         }
@@ -1017,6 +1042,10 @@
               const txt = (b.textContent || '').trim();
               if (txt.includes('استعلام وطباعة الفواتير')) {
                 activeRawLabel = 'استعلام وطباعة الفواتير';
+                break;
+              }
+              if (txt.includes('الفوترة ZATCA') || txt.includes('ZATCA')) {
+                activeRawLabel = 'الفوترة ZATCA';
                 break;
               }
             }
