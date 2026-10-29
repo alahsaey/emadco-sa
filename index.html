@@ -617,6 +617,7 @@
       }
 
       // 3. ربط المصروفات وصافي الربح مع شبكة الإحصائيات في منتصف لوحة القيادة وحساب دقيق 100%
+      // 3. تحسين مظهر وتنسيق بطاقات الإحصائيات (10 بطاقات بنظام شبكي متناسق 5 أعمدة وصفين متطابقين)
       setInterval(() => {
         ensureFloatingExpensesButton();
 
@@ -637,6 +638,11 @@
           return;
         }
 
+        const grid = statsGridInfo.grid;
+
+        // تطبيق تنسيق الشبكة المتقدمة 5 أعمدة على الشاشات الكبيرة لتوزيع البطاقات الـ 10 بشكل متوازن تماماً
+        grid.className = 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5';
+
         const expenses = window.getLocalExpenses();
         const now = new Date();
         const currentMonth = now.toISOString().slice(0, 7);
@@ -644,7 +650,7 @@
           .filter(e => e.date && e.date.startsWith(currentMonth))
           .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-        // استخراج قيمة الأرباح الإجمالية الفعلية من بطاقة النظام الحية (تبدأ من 0.00 وليس رقماً وهمياً)
+        // استخراج قيمة الأرباح الإجمالية الفعلية من بطاقة النظام الحية
         let grossProfitVal = 0.00;
         if (statsGridInfo.grossProfitCard) {
           const valEl = statsGridInfo.grossProfitCard.querySelector('.text-2xl, .font-mono');
@@ -669,72 +675,125 @@
         const netProfitVal = grossProfitVal - monthExpensesTotal;
         const isLoss = netProfitVal < 0;
 
-        // تنسيق الأرقام بطريقة واضحة
+        // تنسيق العملة
         const formatCurrency = (val) => Number(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        // 1. البوكس الأسود: مصروفات المحل والمؤسسة (الشهر)
+        // 1. بطاقة مصروفات المحل والمؤسسة (الشهر)
         let expCard = document.getElementById('injected-expenses-stat-card');
-        if (!expCard || expCard.parentElement !== statsGridInfo.grid) {
+        if (!expCard || expCard.parentElement !== grid) {
           if (expCard) expCard.remove();
           expCard = document.createElement('div');
           expCard.id = 'injected-expenses-stat-card';
-          statsGridInfo.grid.appendChild(expCard);
+          grid.appendChild(expCard);
         }
-        expCard.className = 'p-4 rounded-xl border shadow-sm transition-all hover:border-amber-400/60 cursor-pointer flex flex-col justify-between col-span-1 sm:col-span-1 lg:col-span-2';
-        expCard.style.cssText = 'background: linear-gradient(135deg, #0f172a 0%, #020617 100%) !important; color: #ffffff !important; border: 1px solid #334155 !important; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; min-height: 120px; box-sizing: border-box;';
+        expCard.className = 'bg-white p-4 rounded-xl border border-slate-200 shadow-2xs hover:border-amber-400/80 transition-all cursor-pointer flex flex-col justify-between col-span-1 min-h-[122px]';
+        expCard.style.cssText = 'background: #ffffff !important; color: #0f172a !important; border: 1px solid #e2e8f0 !important; border-radius: 14px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 122px; box-sizing: border-box; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05); transition: all 0.2s ease; cursor: pointer; order: 9;';
         expCard.onclick = () => window.initExpensesUI();
         expCard.title = 'انقر لتسجيل أو إدارة مصروفات المحل والمؤسسة';
         expCard.innerHTML = `
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <span style="font-size:12px;font-weight:700;color:#fbbf24;">مصروفات المحل والمؤسسة (الشهر)</span>
-            <div style="padding:4px 8px;border-radius:8px;background:rgba(245,158,11,0.2);color:#fbbf24;font-size:14px;font-weight:700;">💰</div>
+            <span style="font-size:12px;font-weight:700;color:#334155;">مصروفات المحل والمؤسسة</span>
+            <div style="width:28px;height:28px;border-radius:8px;background:#fef3c7;color:#d97706;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;">💰</div>
           </div>
-          <div style="font-size:24px;font-weight:900;font-family:monospace;color:#fbbf24;margin:4px 0;">
-            ${formatCurrency(monthExpensesTotal)} <span style="font-size:12px;font-weight:700;color:#fde68a;">ر.س</span>
+          <div style="font-size:24px;font-weight:900;font-family:monospace;color:#0f172a;margin:2px 0;">
+            ${formatCurrency(monthExpensesTotal)} <span style="font-size:12px;font-weight:700;color:#64748b;">ر.س</span>
           </div>
-          <div style="font-size:11px;color:#94a3b8;font-weight:600;margin-top:4px;display:flex;align-items:center;justify-content:space-between;">
-            <span>إجمالي مصاريف أجار المحل، الفواتير والرواتب</span>
-            <span style="color:#fbbf24;text-decoration:underline;font-size:10.5px;">تسجيل ➕</span>
+          <div style="font-size:11px;color:#64748b;font-weight:600;margin-top:4px;display:flex;align-items:center;justify-content:space-between;">
+            <span>فواتير تشغيلية ورواتب</span>
+            <span style="color:#b45309;background:#fef3c7;border:1px solid #fde68a;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;">تسجيل ➕</span>
           </div>
         `;
 
-        // 2. البوكس الأخضر: صافي الربح الفعلي (Net Profit)
+        // 2. بطاقة صافي الربح الفعلي (Net Profit)
         let netCard = document.getElementById('injected-net-profit-card');
-        if (!netCard || netCard.parentElement !== statsGridInfo.grid) {
+        if (!netCard || netCard.parentElement !== grid) {
           if (netCard) netCard.remove();
           netCard = document.createElement('div');
           netCard.id = 'injected-net-profit-card';
-          statsGridInfo.grid.appendChild(netCard);
+          grid.appendChild(netCard);
         }
-        netCard.className = 'p-4 rounded-xl border shadow-sm transition-all flex flex-col justify-between col-span-1 sm:col-span-1 lg:col-span-2';
+        netCard.className = 'p-4 rounded-xl border shadow-2xs transition-all flex flex-col justify-between col-span-1 min-h-[122px]';
         if (isLoss) {
-          netCard.style.cssText = 'background: linear-gradient(135deg, #4c0519 0%, #1f0208 100%) !important; color: #ffffff !important; border: 1px solid #be123c !important; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px; box-sizing: border-box;';
+          netCard.style.cssText = 'background: linear-gradient(180deg, #ffffff 0%, #fff1f2 100%) !important; color: #0f172a !important; border: 1.5px solid #fca5a5 !important; border-radius: 14px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 122px; box-sizing: border-box; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05); transition: all 0.2s ease; order: 10;';
           netCard.innerHTML = `
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-              <span style="font-size:12px;font-weight:700;color:#fda4af;">صافي الربح الفعلي (عجز تشغيلي)</span>
-              <div style="padding:4px 8px;border-radius:8px;background:rgba(244,63,94,0.2);color:#fda4af;font-size:14px;font-weight:700;">📉</div>
+              <span style="font-size:12px;font-weight:800;color:#9f1239;">صافي الربح (عجز تشغيلي)</span>
+              <div style="width:28px;height:28px;border-radius:8px;background:#ffe4e6;color:#e11d48;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;">📉</div>
             </div>
-            <div style="font-size:24px;font-weight:900;font-family:monospace;color:#fda4af;margin:4px 0;">
-              ${formatCurrency(netProfitVal)} <span style="font-size:12px;font-weight:700;color:#fecdd3;">ر.س</span>
+            <div style="font-size:24px;font-weight:900;font-family:monospace;color:#be123c;margin:2px 0;">
+              ${formatCurrency(netProfitVal)} <span style="font-size:12px;font-weight:700;color:#e11d48;">ر.س</span>
             </div>
-            <div style="font-size:11px;color:#fecdd3;opacity:0.9;font-weight:600;margin-top:4px;">
-              الأرباح الإجمالية (${formatCurrency(grossProfitVal)}) - المصروفات (${formatCurrency(monthExpensesTotal)})
+            <div style="font-size:10.5px;color:#9f1239;font-weight:600;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+              الأرباح (${formatCurrency(grossProfitVal)}) - المصروفات (${formatCurrency(monthExpensesTotal)})
             </div>
           `;
         } else {
-          netCard.style.cssText = 'background: linear-gradient(135deg, #064e3b 0%, #022c22 100%) !important; color: #ffffff !important; border: 1px solid #059669 !important; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px; box-sizing: border-box;';
+          netCard.style.cssText = 'background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%) !important; color: #0f172a !important; border: 1.5px solid #86efac !important; border-radius: 14px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; min-height: 122px; box-sizing: border-box; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05); transition: all 0.2s ease; order: 10;';
           netCard.innerHTML = `
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-              <span style="font-size:12px;font-weight:700;color:#6ee7b7;">صافي الربح الفعلي (Net Profit)</span>
-              <div style="padding:4px 8px;border-radius:8px;background:rgba(16,185,129,0.2);color:#6ee7b7;font-size:14px;font-weight:700;">📈</div>
+              <span style="font-size:12px;font-weight:800;color:#166534;">صافي الربح الفعلي (Net Profit)</span>
+              <div style="width:28px;height:28px;border-radius:8px;background:#dcfce7;color:#16a34a;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;">📈</div>
             </div>
-            <div style="font-size:24px;font-weight:900;font-family:monospace;color:#6ee7b7;margin:4px 0;">
-              ${formatCurrency(netProfitVal)} <span style="font-size:12px;font-weight:700;color:#a7f3d0;">ر.س</span>
+            <div style="font-size:24px;font-weight:900;font-family:monospace;color:#15803d;margin:2px 0;">
+              +${formatCurrency(netProfitVal)} <span style="font-size:12px;font-weight:700;color:#16a34a;">ر.س</span>
             </div>
-            <div style="font-size:11px;color:#a7f3d0;opacity:0.9;font-weight:600;margin-top:4px;">
-              الأرباح الإجمالية (${formatCurrency(grossProfitVal)}) - المصروفات (${formatCurrency(monthExpensesTotal)})
+            <div style="font-size:10.5px;color:#166534;font-weight:600;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+              الأرباح (${formatCurrency(grossProfitVal)}) - المصروفات (${formatCurrency(monthExpensesTotal)})
             </div>
           `;
+        }
+
+        // 3. توحيد مظهر كافة البطاقات وترتيبها بنسق هندسي أنيق
+        const allCards = Array.from(grid.children);
+        allCards.forEach(card => {
+          card.style.minHeight = '122px';
+          card.style.display = 'flex';
+          card.style.flexDirection = 'column';
+          card.style.justifyContent = 'space-between';
+          card.style.borderRadius = '14px';
+          card.style.padding = '15px';
+          card.style.boxSizing = 'border-box';
+          card.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+
+          const txt = card.textContent || '';
+          if (txt.includes('مبيعات اليوم')) card.style.order = '1';
+          else if (txt.includes('مبيعات الشهر الحالي')) card.style.order = '2';
+          else if (txt.includes('إجمالي الفواتير')) card.style.order = '3';
+          else if (txt.includes('متوسط قيمة الفاتورة')) card.style.order = '4';
+          else if (txt.includes('المبيعات الآجلة')) card.style.order = '5';
+          else if (txt.includes('المدفوع نقداً')) card.style.order = '6';
+          else if (txt.includes('المدفوع عبر الشبكة')) card.style.order = '7';
+          else if (txt.includes('الأرباح الإجمالية')) card.style.order = '8';
+        });
+
+        // 4. توحيد بطاقة الأرباح الإجمالية لتتوافق مع الثيم الفاخر لكافة البطاقات
+        if (statsGridInfo.grossProfitCard) {
+          const gCard = statsGridInfo.grossProfitCard;
+          gCard.style.background = '#ffffff';
+          gCard.style.color = '#0f172a';
+          gCard.style.border = '1px solid #e2e8f0';
+          gCard.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.05)';
+          const titleEl = gCard.querySelector('span');
+          if (titleEl) {
+            titleEl.style.color = '#334155';
+            titleEl.style.fontWeight = '700';
+          }
+          const iconWrap = gCard.querySelector('.p-1\\.5, div[class*="rounded-lg"]');
+          if (iconWrap) {
+            iconWrap.style.background = '#eff6ff';
+            iconWrap.style.color = '#2563eb';
+          }
+          const numEl = gCard.querySelector('.text-2xl, .font-mono');
+          if (numEl) {
+            numEl.style.color = '#0f172a';
+            const spanInNum = numEl.querySelector('span');
+            if (spanInNum) spanInNum.style.color = '#64748b';
+          }
+          const marginEl = gCard.querySelector('.text-emerald-400, div[class*="text-emerald"]');
+          if (marginEl) {
+            marginEl.style.color = '#15803d';
+            marginEl.style.fontWeight = '600';
+          }
         }
       }, 500);
 
