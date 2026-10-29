@@ -1,0 +1,35 @@
+[
+  {
+    "id": "supp_1",
+    "name": "مصنع الأهرام للأقفال والمفصلات",
+    "contactPerson": "م. أحمد الشناوي",
+    "phone": "0501112233",
+    "email": "ahram-sales@example.com",
+    "taxNumber": "300123456700003",
+    "city": "الدمام",
+    "balance": 0,
+    "createdAt": "2026-10-28T08:39:25.630Z"
+  },
+  {
+    "id": "supp_2",
+    "name": "شركة توريدات سودال للكيماويات والعزل",
+    "contactPerson": "أ. طارق رضوان",
+    "phone": "0504445566",
+    "email": "soudal-sa@example.com",
+    "taxNumber": "300987654300003",
+    "city": "الرياض",
+    "balance": 0,
+    "createdAt": "2026-10-28T08:39:25.630Z"
+  },
+  {
+    "id": "supp_3",
+    "name": "المصنع الوطني للمسامير والمثبتات الحديدية",
+    "contactPerson": "م. خالد الدوسري",
+    "phone": "0507778899",
+    "email": "national-screws@example.com",
+    "taxNumber": "300555666700003",
+    "city": "الجبيل",
+    "balance": 0,
+    "createdAt": "2026-10-28T08:39:25.630Z"
+  }
+]

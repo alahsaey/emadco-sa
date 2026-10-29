@@ -9,20 +9,163 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="عمادكو ERP" />
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
-    <link rel="icon" type="image/svg+xml" href="/pwa-icon.svg" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" type="image/png" sizes="64x64" href="./favicon.png" />
+    <link rel="icon" type="image/svg+xml" href="./pwa-icon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
     <title>عمادكو (Emadco) - نظام إدارة مواد البناء ونقاط البيع السحابي</title>
     <meta name="description" content="نظام عمادكو (Emadco) السحابي لإدارة مبيعات ومخزون مواد البناء ونقاط البيع POS والفواتير الإلكترونية ZATCA." />
     <meta property="og:title" content="عمادكو (Emadco) - نظام إدارة مواد البناء ونقاط البيع السحابي" />
     <meta property="og:description" content="نظام عمادكو (Emadco) السحابي لإدارة مبيعات ومخزون مواد البناء ونقاط البيع POS والفواتير الإلكترونية ZATCA." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script>
+      (function() {
+        if (window.location.protocol === 'file:') {
+          var serverRunning = false;
+          var activeServerUrl = 'http://localhost:3000';
+          var checkUrls = [
+            'http://localhost:3000/api/health',
+            'http://127.0.0.1:3000/api/health',
+            'http://localhost:3001/api/health',
+            'http://127.0.0.1:3001/api/health',
+            'http://localhost:8080/api/health'
+          ];
+
+          function updateUI(status, foundUrl) {
+            var badge = document.getElementById('server-status-badge');
+            var btn = document.getElementById('open-system-btn');
+            var hint = document.getElementById('server-status-hint');
+            if (!badge || !btn) return;
+
+            if (status === 'online') {
+              serverRunning = true;
+              activeServerUrl = foundUrl || 'http://localhost:3000';
+              badge.style.background = 'rgba(16, 185, 129, 0.2)';
+              badge.style.borderColor = '#10b981';
+              badge.style.color = '#34d399';
+              badge.innerHTML = '🟢 تم تشغيل الخادم المحلي بنجاح! جاري الدخول للنظام...';
+              btn.style.background = '#10b981';
+              btn.style.color = '#ffffff';
+              btn.innerHTML = '🚀 الدخول إلى النظام الآن (' + activeServerUrl + ')';
+              if (hint) {
+                hint.innerHTML = '<span style="color:#34d399;font-weight:bold;">✓ الخادم جاهز، جاري التحويل التلقائي خلال لحظات...</span>';
+              }
+              // تحويل تلقائي فوري
+              setTimeout(function() {
+                window.location.href = activeServerUrl;
+              }, 400);
+            } else {
+              serverRunning = false;
+              badge.style.background = 'rgba(239, 68, 68, 0.15)';
+              badge.style.borderColor = '#ef4444';
+              badge.style.color = '#f87171';
+              badge.innerHTML = '🔴 الخادم المحلي غير مشغل حالياً (متوقف)';
+              btn.style.background = '#334155';
+              btn.style.color = '#94a3b8';
+              btn.innerHTML = '⚠️ الخادم متوقف - شغّل تشغيل_النظام.bat أولاً';
+              if (hint) {
+                hint.innerHTML = 'النظام ينتظر تشغيل الخادم في الخلفية... سيتم تحويلك تلقائياً بمجرد تشغيل الملف.';
+              }
+            }
+          }
+
+          function pingServer() {
+            var checkedCount = 0;
+            var anySuccess = false;
+
+            checkUrls.forEach(function(url) {
+              fetch(url, { method: 'GET', mode: 'cors' })
+                .then(function(res) {
+                  if (res.ok) {
+                    anySuccess = true;
+                    var origin = url.replace('/api/health', '');
+                    updateUI('online', origin);
+                  }
+                })
+                .catch(function() {})
+                .finally(function() {
+                  checkedCount++;
+                  if (checkedCount === checkUrls.length && !anySuccess && !serverRunning) {
+                    updateUI('offline');
+                  }
+                });
+            });
+          }
+
+          // بدء الفحص الدوري كل 1.5 ثانية
+          setInterval(pingServer, 1500);
+          pingServer();
+
+          window.addEventListener('DOMContentLoaded', function() {
+            var warn = document.createElement('div');
+            warn.id = 'file-protocol-warning';
+            warn.style.cssText = 'position:fixed;inset:0;background:#0b1120;color:#ffffff;z-index:9999999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;text-align:center;font-family:system-ui,-apple-system,sans-serif;direction:rtl;overflow-y:auto;';
+            warn.innerHTML = `
+              <div style="max-width:620px;width:100%;background:#1e293b;border:2px solid #f59e0b;border-radius:22px;padding:30px 24px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.7);box-sizing:border-box;">
+                <div style="font-size:46px;margin-bottom:8px;">💻</div>
+                <h2 style="font-size:22px;font-weight:800;color:#f59e0b;margin:0 0 10px 0;">تشغيل نظام عمادكو المحاسبي أوفلاين (بدون إنترنت)</h2>
+
+                <!-- شارة حالة الخادم المباشرة -->
+                <div id="server-status-badge" style="display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:700;border:1px solid #ef4444;background:rgba(239,68,68,0.15);color:#f87171;margin-bottom:18px;transition:all 0.3s ease;">
+                  🔴 الخادم المحلي غير مشغل حالياً (متوقف)
+                </div>
+
+                <div style="background:#0f172a;border-radius:14px;padding:18px;text-align:right;margin-bottom:20px;border:1px solid #334155;line-height:1.9;">
+                  <div style="font-weight:800;color:#38bdf8;margin-bottom:8px;font-size:15px;">📌 خطوتان فقط لتشغيل النظام بنجاح:</div>
+                  <ol style="margin:0;padding-right:20px;font-size:13.5px;color:#f1f5f9;line-height:2.2;">
+                    <li>افتح مجلد النظام على جهازك: <code style="background:#1e293b;color:#fbbf24;padding:2px 8px;border-radius:6px;font-family:monospace;font-size:13px;">emadco-pos</code></li>
+                    <li>انقر نقراً مزدوجاً على أحد ملفات التشغيل: <b style="color:#10b981;background:rgba(16,185,129,0.2);padding:2px 8px;border-radius:6px;">START.bat</b> أو <b style="color:#38bdf8;background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:6px;">تشغيل_النظام.bat</b></li>
+                    <li style="color:#cbd5e1;font-size:12.5px;">(اترك نافذة الخادم مفتوحة في الخلفية - فهي المحرك الذي يشغل النظام بدون إنترنت)</li>
+                  </ol>
+                </div>
+
+                <div style="margin-bottom:16px;">
+                  <button id="open-system-btn" type="button" style="background:#334155;color:#94a3b8;font-weight:800;padding:14px 26px;border-radius:12px;font-size:15px;display:inline-flex;align-items:center;gap:10px;cursor:pointer;border:none;box-shadow:0 4px 14px rgba(0,0,0,0.3);transition:all 0.2s ease;">
+                    ⚠️ الخادم متوقف - شغّل تشغيل_النظام.bat أولاً
+                  </button>
+                </div>
+
+                <div id="server-status-hint" style="font-size:12.5px;color:#94a3b8;line-height:1.7;">
+                  النظام يفحص اتصال جهازك بالخادم تلقائياً... بمجرد تشغيل الملف ستفتح الشاشة فوراً.
+                </div>
+
+                <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #334155;font-size:11.5px;color:#64748b;">
+                  💡 سبب هذا الإجراء: حماية بيانات فواتيرك ومخزونك وضمان عمل قاعدة البيانات المحلية بأمان تام أوفلاين.
+                </div>
+              </div>
+            `;
+
+            document.body.appendChild(warn);
+
+            var btn = document.getElementById('open-system-btn');
+            if (btn) {
+              btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (serverRunning) {
+                  window.location.href = activeServerUrl;
+                } else {
+                  alert('⚠️ تنبيه:\nالخادم المحلي لم يتم تشغيله بعد على جهاز الكمبيوتر.\n\nيرجى الذهاب إلى مجلد البرنامج والنقر نقراً مزدوجاً على:\n(تشغيل_النظام.bat)\n\nواترك النافذة السوداء مفتوحة ليعمل النظام!');
+                  pingServer();
+                }
+              });
+            }
+          });
+        }
+      })();
+    </script>
+    <!-- تحميل خطوط جوجل بنمط غير معطل للأوفلاين (Non-blocking for Offline-First) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap">
+    </noscript>
     <style>
+      *, html, body {
+        font-family: 'Cairo', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif;
+      }
       #initial-splash {
         position: fixed;
         inset: 0;
@@ -33,22 +176,22 @@
         justify-content: center;
         background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
         color: #f8fafc;
-        font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
         user-select: none;
+        transition: opacity 0.4s ease, transform 0.4s ease;
       }
       .splash-logo-container {
         position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 140px;
-        height: 140px;
-        margin-bottom: 24px;
+        width: 130px;
+        height: 130px;
+        margin-bottom: 20px;
         animation: splashPulse 2.4s ease-in-out infinite alternate;
       }
       .splash-logo-img {
-        width: 130px;
-        height: 130px;
+        width: 120px;
+        height: 120px;
         object-fit: contain;
         filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
       }
@@ -57,12 +200,12 @@
         100% { transform: scale(1.04); filter: drop-shadow(0 16px 32px rgba(245, 158, 11, 0.45)); }
       }
       .splash-bar {
-        width: 160px;
-        height: 4px;
-        background: rgba(255, 255, 255, 0.1);
+        width: 180px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.12);
         border-radius: 999px;
         overflow: hidden;
-        margin-top: 18px;
+        margin-top: 20px;
         position: relative;
       }
       .splash-bar-progress {
@@ -73,11 +216,24 @@
         width: 45%;
         background: linear-gradient(90deg, #f59e0b, #fbbf24);
         border-radius: 999px;
-        animation: splashProgress 1.6s ease-in-out infinite alternate;
+        animation: splashProgress 1.4s ease-in-out infinite alternate;
       }
       @keyframes splashProgress {
-        0% { left: 0%; width: 25%; }
-        100% { left: 75%; width: 25%; }
+        0% { left: 0%; width: 30%; }
+        100% { left: 70%; width: 30%; }
+      }
+      .splash-offline-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        color: #10b981;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        padding: 3px 10px;
+        border-radius: 999px;
+        margin-top: 14px;
+        font-weight: 600;
       }
       #floating-expenses-btn {
         position: fixed;
@@ -115,25 +271,106 @@
         }
       }
     </style>
-    <script type="module" crossorigin src="/assets/index-DXj0RJXN.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CzAWPH_Z.css">
+    <script type="module" crossorigin src="./assets/index-DXj0RJXN.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CzAWPH_Z.css">
   </head>
   <body class="font-sans antialiased bg-slate-50 text-slate-900 selection:bg-amber-500 selection:text-white">
     <div id="root">
-      <!-- شاشة الإقلاع الأولية بالشعار الأصلي الشفاف المتناسق مع خلفية الجوال وشريط المهام -->
+      <!-- شاشة الإقلاع الأولية بالشعار المدمج محلياً لضمان الظهور بدون إنترنت -->
       <div id="initial-splash">
         <div class="splash-logo-container">
-          <img src="/pwa-icon.svg" alt="عمادكو لمواد البناء" class="splash-logo-img" />
+          <svg class="splash-logo-img" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="splashNavy" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#1E4570" />
+                <stop offset="100%" stop-color="#0B1E33" />
+              </linearGradient>
+              <linearGradient id="splashGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#F2B73F" />
+                <stop offset="100%" stop-color="#B07314" />
+              </linearGradient>
+            </defs>
+            <path d="M256 12 L206 58 L206 172 L256 142 Z" fill="url(#splashNavy)" />
+            <path d="M256 12 L306 58 L306 172 L256 142 Z" fill="url(#splashGold)" />
+            <path d="M256 68 L32 232 L46 250 L84 238 L256 112 Z" fill="url(#splashNavy)" />
+            <path d="M256 68 L480 232 L466 250 L428 238 L256 112 Z" fill="url(#splashGold)" />
+            <polygon points="256,134 386,198 386,340 256,414 126,340 126,198" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="3" />
+            <polygon points="256,150 264,166 282,168 268,180 273,198 256,188 239,198 244,180 230,168 248,166" fill="url(#splashGold)" />
+            <path d="M246 190 L266 190 L266 320 L246 320 Z" fill="url(#splashNavy)" />
+            <circle cx="256" cy="340" r="16" fill="url(#splashGold)" />
+            <path d="M256 462 L256 502 L224 492 L220 456 Z" fill="url(#splashNavy)" />
+            <path d="M256 462 L256 502 L288 492 L292 456 Z" fill="url(#splashGold)" />
+          </svg>
         </div>
-        <h1 style="font-size: 20px; font-weight: 800; margin: 0; color: #ffffff; letter-spacing: -0.02em;">مؤسسة عماد سعد آل سعيد</h1>
-        <p style="font-size: 13px; font-weight: 600; margin: 6px 0 0 0; color: #f59e0b;">نظام إدارة مواد البناء ونقاط البيع السحابي</p>
+        <h1 style="font-size: 21px; font-weight: 800; margin: 0; color: #ffffff; letter-spacing: -0.02em;">مؤسسة عماد سعد آل سعيد</h1>
+        <p style="font-size: 13.5px; font-weight: 600; margin: 6px 0 0 0; color: #f59e0b;">نظام إدارة مواد البناء ونقاط البيع السحابي والمحلي</p>
         <div class="splash-bar">
           <div class="splash-bar-progress"></div>
         </div>
-        <span style="font-size: 11px; color: #94a3b8; margin-top: 12px; font-weight: 500;">جاري تهيئة النظام السحابي والبيانات...</span>
+        <div class="splash-offline-tag">
+          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#10b981;animation:pulse 1.5s infinite;"></span>
+          <span>جاهز للعمل دون اتصال بالإنترنت (Offline Ready)</span>
+        </div>
+        <button id="splash-force-enter-btn" onclick="window.forceDismissSplash()" style="display:none;margin-top:16px;background:rgba(245,158,11,0.2);border:1px solid #f59e0b;color:#fbbf24;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">دخول النظام فوراً ⬅</button>
       </div>
     </div>
     <script>
+      // حارس الإقلاع الفوري: يضمن عدم بقاء شاشة الإقلاع معلقة نهائياً عند انقطاع الإنترنت
+      window.dismissInitialSplash = function() {
+        const splash = document.getElementById('initial-splash');
+        if (splash) {
+          splash.style.opacity = '0';
+          splash.style.transform = 'scale(0.97)';
+          splash.style.pointerEvents = 'none';
+          setTimeout(() => {
+            if (splash && splash.parentNode) {
+              splash.parentNode.removeChild(splash);
+            }
+          }, 400);
+        }
+      };
+
+      window.forceDismissSplash = function() {
+        window.dismissInitialSplash();
+      };
+
+      // 1. إظهار زر التخطي السريع بعد ثانية ونصف كإجراء أمان إضافي
+      setTimeout(() => {
+        const btn = document.getElementById('splash-force-enter-btn');
+        if (btn) btn.style.display = 'inline-block';
+      }, 1500);
+
+      // 2. إخفاء الشاشة تلقائياً بعد ثانيتين كحد أقصى لمنع أي تعليق
+      setTimeout(() => {
+        window.dismissInitialSplash();
+      }, 2200);
+
+      // 3. مراقبة تحميل واجهة React
+      if (window.MutationObserver) {
+        const root = document.getElementById('root');
+        if (root) {
+          const obs = new MutationObserver((mutations) => {
+            for (const m of mutations) {
+              for (const node of m.addedNodes) {
+                if (node.nodeType === 1 && node.id !== 'initial-splash') {
+                  window.dismissInitialSplash();
+                  obs.disconnect();
+                  return;
+                }
+              }
+            }
+          });
+          obs.observe(root, { childList: true, subtree: true });
+        }
+      }
+
+      // منع الأخطاء الناتجة عن محاولة الاتصال بالخوادم البعيدة أثناء عدم توفر الإنترنت من إيقاف الصفحة
+      window.addEventListener('unhandledrejection', (ev) => {
+        if (ev.reason && (String(ev.reason).includes('fetch') || String(ev.reason).includes('network') || String(ev.reason).includes('Failed to fetch'))) {
+          ev.preventDefault();
+        }
+      });
+
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js').then((reg) => {
@@ -307,8 +544,13 @@
         window.loadExpensesModalData();
       };
 
-      // 1. إعادة الزر العائم لإدارة وتسجيل المصروفات في أسفل يمين الشاشة
+      // 1. إعادة الزر العائم لإدارة وتسجيل المصروفات في أسفل يمين الشاشة (فقط عند اكتمال تحميل لوحة النظام)
       const ensureFloatingExpensesButton = () => {
+        if (window.location.protocol === 'file:') return;
+        const root = document.getElementById('root');
+        if (!root || !root.querySelector('nav, aside, main, header, div[class*="min-h"], div[class*="grid"]')) {
+          return;
+        }
         let btn = document.getElementById('floating-expenses-btn');
         if (!btn) {
           btn = document.createElement('button');
@@ -344,10 +586,10 @@
 
       // دالة لتحديد شبكة بطاقات الإحصائيات في منتصف لوحة التحكم بدقة تامة
       function getDashboardStatsGrid() {
-        const allSpans = document.querySelectorAll('span, p, div');
+        const allSpans = document.querySelectorAll('span, p, div, h3, h4');
         for (const el of allSpans) {
-          // البحث عن بطاقة الأرباح الإجمالية بالاسم الدقيق
-          if (el.childNodes.length === 1 && el.textContent.trim() === 'الأرباح الإجمالية (Gross Profit)') {
+          // البحث عن بطاقة الأرباح الإجمالية بالاسم
+          if (el.textContent && el.textContent.includes('الأرباح الإجمالية (Gross Profit)')) {
             const card = el.closest('.rounded-xl') || el.closest('[class*="rounded"]');
             if (card) {
               const grid = card.closest('.grid') || (card.parentElement && card.parentElement.classList.contains('grid') ? card.parentElement : null);
@@ -360,7 +602,7 @@
 
         // بحث احتياطي عبر بطاقة مبيعات اليوم
         for (const el of allSpans) {
-          if (el.childNodes.length === 1 && el.textContent.trim() === 'مبيعات اليوم') {
+          if (el.textContent && el.textContent.includes('مبيعات اليوم')) {
             const card = el.closest('.rounded-xl') || el.closest('[class*="rounded"]');
             if (card) {
               const grid = card.closest('.grid') || (card.parentElement && card.parentElement.classList.contains('grid') ? card.parentElement : null);
@@ -374,7 +616,7 @@
         return null;
       }
 
-      // 3. ربط المصروفات مع شبكة الإحصائيات في منتصف لوحة القيادة وحذف أي بطاقات أسفل النظام
+      // 3. ربط المصروفات وصافي الربح مع شبكة الإحصائيات في منتصف لوحة القيادة وحساب دقيق 100%
       setInterval(() => {
         ensureFloatingExpensesButton();
 
@@ -383,7 +625,7 @@
 
         const statsGridInfo = getDashboardStatsGrid();
 
-        // إزالة أي بطاقات إحصائيات للمصروفات أو صافي الربح متواجدة خارج شبكة الإحصائيات (مثل ظهورها أسفل الصفحة)
+        // إزالة أي بطاقات إحصائيات للمصروفات أو صافي الربح متواجدة خارج شبكة الإحصائيات
         document.querySelectorAll('#injected-expenses-stat-card, #injected-net-profit-card').forEach(el => {
           if (!statsGridInfo || el.parentElement !== statsGridInfo.grid) {
             el.remove();
@@ -402,25 +644,33 @@
           .filter(e => e.date && e.date.startsWith(currentMonth))
           .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-        // استخراج قيمة الأرباح الإجمالية من بطاقة النظام
-        let grossProfitVal = 288.00;
+        // استخراج قيمة الأرباح الإجمالية الفعلية من بطاقة النظام الحية (تبدأ من 0.00 وليس رقماً وهمياً)
+        let grossProfitVal = 0.00;
         if (statsGridInfo.grossProfitCard) {
-          const cardText = statsGridInfo.grossProfitCard.textContent || '';
-          const match = cardText.match(/([\d,]+\.?\d*)\s*ر\.س/);
-          if (match) {
-            const parsed = parseFloat(match[1].replace(/,/g, ''));
-            if (!isNaN(parsed) && parsed > 0) grossProfitVal = parsed;
+          const valEl = statsGridInfo.grossProfitCard.querySelector('.text-2xl, .font-mono');
+          if (valEl) {
+            const cleanText = valEl.textContent.replace(/,/g, '').trim();
+            const numMatch = cleanText.match(/-?[\d]+\.?\d*/);
+            if (numMatch) {
+              const parsed = parseFloat(numMatch[0]);
+              if (!isNaN(parsed)) grossProfitVal = parsed;
+            }
           } else {
-            const valEl = statsGridInfo.grossProfitCard.querySelector('.text-2xl');
-            if (valEl) {
-              const num = parseFloat(valEl.textContent.replace(/[^\d.]/g, ''));
-              if (!isNaN(num) && num > 0) grossProfitVal = num;
+            const cardText = (statsGridInfo.grossProfitCard.textContent || '').replace(/,/g, '');
+            const match = cardText.match(/([\d]+\.?\d*)\s*(?:ر\.س)?/);
+            if (match) {
+              const parsed = parseFloat(match[1]);
+              if (!isNaN(parsed)) grossProfitVal = parsed;
             }
           }
         }
 
-        // حساب صافي الربح الفعلي بعد خصم المصروفات
+        // حساب صافي الربح الفعلي رياضياً بدقة متناهية: الأرباح الإجمالية - المصروفات
         const netProfitVal = grossProfitVal - monthExpensesTotal;
+        const isLoss = netProfitVal < 0;
+
+        // تنسيق الأرقام بطريقة واضحة
+        const formatCurrency = (val) => Number(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
         // 1. البوكس الأسود: مصروفات المحل والمؤسسة (الشهر)
         let expCard = document.getElementById('injected-expenses-stat-card');
@@ -430,20 +680,21 @@
           expCard.id = 'injected-expenses-stat-card';
           statsGridInfo.grid.appendChild(expCard);
         }
-        expCard.className = 'p-4 rounded-xl border shadow-2xs transition-all bg-gradient-to-br from-slate-900 to-slate-950 text-white border-slate-800 hover:border-amber-400/50 cursor-pointer flex flex-col justify-between';
+        expCard.className = 'p-4 rounded-xl border shadow-sm transition-all hover:border-amber-400/60 cursor-pointer flex flex-col justify-between col-span-1 sm:col-span-1 lg:col-span-2';
+        expCard.style.cssText = 'background: linear-gradient(135deg, #0f172a 0%, #020617 100%) !important; color: #ffffff !important; border: 1px solid #334155 !important; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; min-height: 120px; box-sizing: border-box;';
         expCard.onclick = () => window.initExpensesUI();
         expCard.title = 'انقر لتسجيل أو إدارة مصروفات المحل والمؤسسة';
         expCard.innerHTML = `
-          <div class="flex items-center justify-between mb-1.5">
-            <span class="text-xs font-bold text-amber-400">مصروفات المحل والمؤسسة (الشهر)</span>
-            <div class="p-1.5 rounded-lg bg-amber-400/20 text-amber-400 text-sm font-bold">💰</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:12px;font-weight:700;color:#fbbf24;">مصروفات المحل والمؤسسة (الشهر)</span>
+            <div style="padding:4px 8px;border-radius:8px;background:rgba(245,158,11,0.2);color:#fbbf24;font-size:14px;font-weight:700;">💰</div>
           </div>
-          <div class="text-2xl font-black font-mono text-amber-400 my-1">
-            ${monthExpensesTotal.toFixed(2)} <span class="text-xs font-bold text-amber-300">ر.س</span>
+          <div style="font-size:24px;font-weight:900;font-family:monospace;color:#fbbf24;margin:4px 0;">
+            ${formatCurrency(monthExpensesTotal)} <span style="font-size:12px;font-weight:700;color:#fde68a;">ر.س</span>
           </div>
-          <div class="text-[11px] text-slate-400 font-semibold mt-1 flex items-center justify-between">
+          <div style="font-size:11px;color:#94a3b8;font-weight:600;margin-top:4px;display:flex;align-items:center;justify-content:space-between;">
             <span>إجمالي مصاريف أجار المحل، الفواتير والرواتب</span>
-            <span class="text-amber-400 text-[10px] underline hover:text-amber-300">تسجيل ➕</span>
+            <span style="color:#fbbf24;text-decoration:underline;font-size:10.5px;">تسجيل ➕</span>
           </div>
         `;
 
@@ -455,20 +706,99 @@
           netCard.id = 'injected-net-profit-card';
           statsGridInfo.grid.appendChild(netCard);
         }
-        netCard.className = 'p-4 rounded-xl border shadow-2xs transition-all bg-gradient-to-br from-emerald-900 to-emerald-950 text-white border-emerald-800 hover:border-emerald-400/50 flex flex-col justify-between';
-        netCard.innerHTML = `
-          <div class="flex items-center justify-between mb-1.5">
-            <span class="text-xs font-bold text-emerald-300">صافي الربح الفعلي (Net Profit)</span>
-            <div class="p-1.5 rounded-lg bg-emerald-400/20 text-emerald-300 text-sm font-bold">📈</div>
-          </div>
-          <div class="text-2xl font-black font-mono text-emerald-300 my-1">
-            ${netProfitVal.toFixed(2)} <span class="text-xs font-bold text-emerald-200">ر.س</span>
-          </div>
-          <div class="text-[11px] text-emerald-200/90 font-semibold mt-1">
-            الأرباح الإجمالية (${grossProfitVal.toFixed(2)}) - المصروفات (${monthExpensesTotal.toFixed(2)})
-          </div>
-        `;
+        netCard.className = 'p-4 rounded-xl border shadow-sm transition-all flex flex-col justify-between col-span-1 sm:col-span-1 lg:col-span-2';
+        if (isLoss) {
+          netCard.style.cssText = 'background: linear-gradient(135deg, #4c0519 0%, #1f0208 100%) !important; color: #ffffff !important; border: 1px solid #be123c !important; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px; box-sizing: border-box;';
+          netCard.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-size:12px;font-weight:700;color:#fda4af;">صافي الربح الفعلي (عجز تشغيلي)</span>
+              <div style="padding:4px 8px;border-radius:8px;background:rgba(244,63,94,0.2);color:#fda4af;font-size:14px;font-weight:700;">📉</div>
+            </div>
+            <div style="font-size:24px;font-weight:900;font-family:monospace;color:#fda4af;margin:4px 0;">
+              ${formatCurrency(netProfitVal)} <span style="font-size:12px;font-weight:700;color:#fecdd3;">ر.س</span>
+            </div>
+            <div style="font-size:11px;color:#fecdd3;opacity:0.9;font-weight:600;margin-top:4px;">
+              الأرباح الإجمالية (${formatCurrency(grossProfitVal)}) - المصروفات (${formatCurrency(monthExpensesTotal)})
+            </div>
+          `;
+        } else {
+          netCard.style.cssText = 'background: linear-gradient(135deg, #064e3b 0%, #022c22 100%) !important; color: #ffffff !important; border: 1px solid #059669 !important; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px; box-sizing: border-box;';
+          netCard.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-size:12px;font-weight:700;color:#6ee7b7;">صافي الربح الفعلي (Net Profit)</span>
+              <div style="padding:4px 8px;border-radius:8px;background:rgba(16,185,129,0.2);color:#6ee7b7;font-size:14px;font-weight:700;">📈</div>
+            </div>
+            <div style="font-size:24px;font-weight:900;font-family:monospace;color:#6ee7b7;margin:4px 0;">
+              ${formatCurrency(netProfitVal)} <span style="font-size:12px;font-weight:700;color:#a7f3d0;">ر.س</span>
+            </div>
+            <div style="font-size:11px;color:#a7f3d0;opacity:0.9;font-weight:600;margin-top:4px;">
+              الأرباح الإجمالية (${formatCurrency(grossProfitVal)}) - المصروفات (${formatCurrency(monthExpensesTotal)})
+            </div>
+          `;
+        }
       }, 500);
+
+      // معالج شامل لعملية تسجيل الخروج وضمان إنهاء الجلسة تماماً وتحديث حالة الاتصال بالعضوية
+      window.performSystemLogout = function() {
+        try {
+          const authKeys = [
+            'esa', 'emadco_current_user', 'emadco_auth', 'user', 'currentUser',
+            'auth_token', 'emadco_session', 'auth', 'logged_user', 'session',
+            'emadco_user_session', 'emadco_logged_in'
+          ];
+          authKeys.forEach(key => {
+            localStorage.removeItem(key);
+            sessionStorage.removeItem(key);
+          });
+
+          for (let i = localStorage.length - 1; i >= 0; i--) {
+            const k = localStorage.key(i);
+            if (k && (k.includes('auth') || k.includes('user') || k.includes('session') || k.includes('esa') || k.includes('emadco'))) {
+              localStorage.removeItem(k);
+            }
+          }
+
+          fetch('/api/db/users', { method: 'GET' })
+            .then(res => res.json())
+            .then(data => {
+              if (data && Array.isArray(data.data)) {
+                data.data.forEach(u => {
+                  u.isOnline = false;
+                  u.lastActiveAt = new Date().toISOString();
+                  fetch(`/api/db/users/${u.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(u)
+                  }).catch(() => {});
+                });
+              }
+            }).catch(() => {});
+        } catch (e) {
+          console.warn('Logout cleanup notice:', e);
+        }
+
+        window.location.href = window.location.pathname;
+      };
+
+      document.addEventListener('click', function(e) {
+        const target = e.target.closest('button, a, div');
+        if (!target) return;
+        const text = (target.textContent || '').trim();
+        if (
+          text === 'تسجيل خروج' ||
+          text === 'تسجيل الخروج' ||
+          text === 'خروج' ||
+          text === 'Logout' ||
+          target.getAttribute('aria-label') === 'تسجيل خروج' ||
+          target.title === 'تسجيل خروج' ||
+          target.id.includes('logout') ||
+          target.className.includes('logout')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.performSystemLogout();
+        }
+      }, true);
     </script>
   </body>
 </html>

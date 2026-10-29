@@ -1,0 +1,32 @@
+[
+  {
+    "id": "br_ahram",
+    "nameAr": "أهرام (Ahram)",
+    "country": "مصر",
+    "isActive": true
+  },
+  {
+    "id": "br_stanley",
+    "nameAr": "ستانلي (Stanley)",
+    "country": "أمريكا",
+    "isActive": true
+  },
+  {
+    "id": "br_total",
+    "nameAr": "توتال (TOTAL Tools)",
+    "country": "الصين",
+    "isActive": true
+  },
+  {
+    "id": "br_soudal",
+    "nameAr": "سودال (Soudal)",
+    "country": "بلجيكا",
+    "isActive": true
+  },
+  {
+    "id": "br_national",
+    "nameAr": "الوطني (National)",
+    "country": "السعودية",
+    "isActive": true
+  }
+]

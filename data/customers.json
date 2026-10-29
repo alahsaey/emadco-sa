@@ -1,0 +1,34 @@
+[
+  {
+    "id": "cust_walk_in",
+    "name": "عميل نقدي مباشر",
+    "phone": "0500000000",
+    "customerType": "retail",
+    "priceTier": "retail",
+    "creditLimit": 0,
+    "currentBalance": 0,
+    "createdAt": "2026-10-28T08:39:25.630Z"
+  },
+  {
+    "id": "cust_contractor_1",
+    "name": "شركة المقاولات الحديثة للتطوير",
+    "phone": "0551234567",
+    "customerType": "contractor",
+    "priceTier": "contractor",
+    "taxNumber": "310948572100001",
+    "creditLimit": 75000,
+    "currentBalance": 0,
+    "createdAt": "2026-10-28T08:39:25.630Z"
+  },
+  {
+    "id": "cust_contractor_2",
+    "name": "مؤسسة الأفق للتعمير والديكور",
+    "phone": "0569876543",
+    "customerType": "contractor",
+    "priceTier": "contractor",
+    "taxNumber": "310948572100002",
+    "creditLimit": 50000,
+    "currentBalance": 0,
+    "createdAt": "2026-10-28T08:39:25.630Z"
+  }
+]

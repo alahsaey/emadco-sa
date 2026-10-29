@@ -1,0 +1,74 @@
+[
+  {
+    "id": "dashboard:view",
+    "code": "dashboard:view",
+    "label": "الدخول للوحة القيادة والمؤشرات المالية",
+    "category": "لوحة التحكم"
+  },
+  {
+    "id": "reports:view",
+    "code": "reports:view",
+    "label": "استعراض التقارير والأرباح وحركة المبيعات",
+    "category": "التقارير"
+  },
+  {
+    "id": "settings:manage",
+    "code": "settings:manage",
+    "label": "الوصول لإعدادات النظام والنسخ الاحتياطي والـ ZATCA",
+    "category": "النظام"
+  },
+  {
+    "id": "users:manage",
+    "code": "users:manage",
+    "label": "إدارة وتعديل حسابات المستخدمين والصلاحيات",
+    "category": "النظام"
+  },
+  {
+    "id": "sales:create",
+    "code": "sales:create",
+    "label": "إصدار فواتير نقاط البيع (POS)",
+    "category": "المبيعات"
+  },
+  {
+    "id": "sales:discount",
+    "code": "sales:discount",
+    "label": "منح خصومات إضافية للعملاء",
+    "category": "المبيعات"
+  },
+  {
+    "id": "products:view",
+    "code": "products:view",
+    "label": "استعراض قائمة الأصناف والكتالوج",
+    "category": "الكتالوج والمخزون"
+  },
+  {
+    "id": "products:create",
+    "code": "products:create",
+    "label": "إضافة أصناف جديدة للكتالوج",
+    "category": "الكتالوج والمخزون"
+  },
+  {
+    "id": "inventory:view",
+    "code": "inventory:view",
+    "label": "استعراض أرصدة وحركات المخازن",
+    "category": "الكتالوج والمخزون"
+  },
+  {
+    "id": "inventory:adjust",
+    "code": "inventory:adjust",
+    "label": "تسوية الجرد وإثبات الهوالك والنواقص",
+    "category": "الكتالوج والمخزون"
+  },
+  {
+    "id": "customers:manage",
+    "code": "customers:manage",
+    "label": "إدارة بطاقات وحسابات العملاء",
+    "category": "العملاء والموردين"
+  },
+  {
+    "id": "suppliers:manage",
+    "code": "suppliers:manage",
+    "label": "إدارة بطاقات الموردين وفواتير الشراء",
+    "category": "العملاء والموردين"
+  }
+]

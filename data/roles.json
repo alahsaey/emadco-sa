@@ -1,0 +1,101 @@
+[
+  {
+    "id": "role_system_owner",
+    "key": "system_owner",
+    "nameAr": "الدعم الفني Admin",
+    "badgeColor": "bg-rose-100 text-rose-800 border-rose-300",
+    "description": "صلاحيات عليا مطلقة لإدارة النظام، الإعدادات، المستخدمين والتقارير المالية والنسخ الاحتياطي.",
+    "defaultPermissions": [
+      "all"
+    ],
+    "permissionIds": [
+      "perm_all"
+    ]
+  },
+  {
+    "id": "role_manager",
+    "key": "manager",
+    "nameAr": "مدير المنشأة (Manager)",
+    "badgeColor": "bg-amber-100 text-amber-800 border-amber-300",
+    "description": "إدارة تشغيلية للمبيعات، المشتريات، المخزون، والعملاء والموردين والتقارير التشغيلية.",
+    "defaultPermissions": [
+      "products:view",
+      "products:create",
+      "products:edit",
+      "inventory:view",
+      "inventory:adjust",
+      "sales:create",
+      "sales:discount",
+      "purchases:create",
+      "customers:manage",
+      "suppliers:manage"
+    ],
+    "permissionIds": [
+      "products:view",
+      "products:create",
+      "products:edit",
+      "inventory:view",
+      "inventory:adjust",
+      "sales:create",
+      "sales:discount",
+      "purchases:create",
+      "customers:manage",
+      "suppliers:manage"
+    ]
+  },
+  {
+    "id": "role_cashier",
+    "key": "cashier",
+    "nameAr": "كاشير نقطة البيع (Cashier)",
+    "badgeColor": "bg-emerald-100 text-emerald-800 border-emerald-300",
+    "description": "إصدار الفواتير الفورية، تحصيل المدفوعات، قراءة الباركود، والمرتجعات المصرحة.",
+    "defaultPermissions": [
+      "products:view",
+      "sales:create"
+    ],
+    "permissionIds": [
+      "products:view",
+      "sales:create"
+    ]
+  },
+  {
+    "id": "role_sales_rep",
+    "key": "sales_rep",
+    "nameAr": "مندوب مبيعات مقاولين (Sales)",
+    "badgeColor": "bg-blue-100 text-blue-800 border-blue-300",
+    "description": "إعداد عروض الأسعار، مبيعات الآجل للمقاولين، ومتابعة المشاريع والعملاء.",
+    "defaultPermissions": [
+      "products:view",
+      "sales:create",
+      "customers:manage",
+      "inventory:view"
+    ],
+    "permissionIds": [
+      "products:view",
+      "sales:create",
+      "customers:manage",
+      "inventory:view"
+    ]
+  },
+  {
+    "id": "role_inventory_officer",
+    "key": "inventory_officer",
+    "nameAr": "مسؤول المستودعات (Inventory)",
+    "badgeColor": "bg-indigo-100 text-indigo-800 border-indigo-300",
+    "description": "استلام بضائع الموردين، التحويل بين المستودعات، وتسويات الجرد ومراقبة النواقص.",
+    "defaultPermissions": [
+      "products:view",
+      "inventory:view",
+      "inventory:adjust",
+      "inventory:transfer",
+      "purchases:create"
+    ],
+    "permissionIds": [
+      "products:view",
+      "inventory:view",
+      "inventory:adjust",
+      "inventory:transfer",
+      "purchases:create"
+    ]
+  }
+]

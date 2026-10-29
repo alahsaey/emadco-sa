@@ -1,0 +1,24 @@
+[
+  {
+    "id": "wh_main",
+    "nameAr": "المستودع الرئيسي",
+    "code": "WH-01",
+    "branchId": "branch_main",
+    "location": "المنطقة الصناعية - مستودع المواد المركزية",
+    "managerName": "أبو فهد العتيبي",
+    "isPrimary": true,
+    "isActive": true,
+    "order": 1
+  },
+  {
+    "id": "wh_showroom",
+    "nameAr": "مستودع صالة العرض",
+    "code": "WH-02",
+    "branchId": "branch_main",
+    "location": "معرض طريق الملك فهد",
+    "managerName": "سلطان القحطاني",
+    "isPrimary": false,
+    "isActive": true,
+    "order": 2
+  }
+]

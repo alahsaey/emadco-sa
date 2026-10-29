@@ -1,0 +1,82 @@
+[
+  {
+    "id": "inv_prod_1_wh_main",
+    "productId": "prod_1",
+    "warehouseId": "wh_main",
+    "quantityOnHand": 120,
+    "reservedQuantity": 0,
+    "availableQuantity": 120,
+    "averageCost": 45,
+    "lastUpdated": "2026-10-28T08:39:25.630Z"
+  },
+  {
+    "id": "inv_prod_2_wh_main",
+    "productId": "prod_2",
+    "warehouseId": "wh_main",
+    "quantityOnHand": 85,
+    "reservedQuantity": 0,
+    "availableQuantity": 85,
+    "averageCost": 30,
+    "lastUpdated": "2026-10-28T08:39:25.630Z"
+  },
+  {
+    "id": "inv_prod_3_wh_main",
+    "productId": "prod_3",
+    "warehouseId": "wh_main",
+    "quantityOnHand": 240,
+    "reservedQuantity": 0,
+    "availableQuantity": 240,
+    "averageCost": 8.5,
+    "lastUpdated": "2026-10-28T08:39:25.630Z"
+  },
+  {
+    "id": "inv_prod_4_wh_main",
+    "productId": "prod_4",
+    "warehouseId": "wh_main",
+    "quantityOnHand": 90,
+    "reservedQuantity": 0,
+    "availableQuantity": 90,
+    "averageCost": 22,
+    "lastUpdated": "2026-10-28T08:39:25.630Z"
+  },
+  {
+    "id": "inv_prod_5_wh_main",
+    "productId": "prod_5",
+    "warehouseId": "wh_main",
+    "quantityOnHand": 65,
+    "reservedQuantity": 0,
+    "availableQuantity": 65,
+    "averageCost": 18,
+    "lastUpdated": "2026-10-28T08:39:25.630Z"
+  },
+  {
+    "id": "inv_prod_6_wh_main",
+    "productId": "prod_6",
+    "warehouseId": "wh_main",
+    "quantityOnHand": 45,
+    "reservedQuantity": 0,
+    "availableQuantity": 45,
+    "averageCost": 38,
+    "lastUpdated": "2026-10-28T08:39:25.630Z"
+  },
+  {
+    "id": "inv_prod_7_wh_main",
+    "productId": "prod_7",
+    "warehouseId": "wh_main",
+    "quantityOnHand": 150,
+    "reservedQuantity": 0,
+    "availableQuantity": 150,
+    "averageCost": 12,
+    "lastUpdated": "2026-10-28T08:39:25.630Z"
+  },
+  {
+    "id": "inv_prod_8_wh_main",
+    "productId": "prod_8",
+    "warehouseId": "wh_main",
+    "quantityOnHand": 110,
+    "reservedQuantity": 0,
+    "availableQuantity": 110,
+    "averageCost": 28,
+    "lastUpdated": "2026-10-28T08:39:25.630Z"
+  }
+]

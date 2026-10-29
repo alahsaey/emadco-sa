@@ -19,6 +19,17 @@ import makeWASocket, {
 import type { WASocket } from '@whiskeysockets/baileys';
 import pino from 'pino';
 import { waDriver } from './whatsapp-direct-driver.js';
+import {
+  DATA_DIR,
+  readCollection,
+  writeCollection,
+  getDocument,
+  saveDocument,
+  deleteDocument,
+  applyBatch,
+  getDatabaseStatus,
+  seedDefaultDataIfEmpty,
+} from './local_db.ts';
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
@@ -1243,6 +1254,143 @@ app.post('/api/expenses/delete', (req: Request, res: Response) => {
   }
 });
 
+// ==========================================
+// محرك قاعدة البيانات المحلية المباشرة على الكمبيوتر (Local Disk DB API)
+// ==========================================
+
+// فحص حالة قاعدة البيانات والملفات على قرص الكمبيوتر
+app.get('/api/db/health', (req: Request, res: Response) => {
+  try {
+    const status = getDatabaseStatus();
+    res.json({ success: true, ...status });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message || 'تعذر فحص قاعدة البيانات المحلية' });
+  }
+});
+
+app.get('/api/db/status', (req: Request, res: Response) => {
+  try {
+    const status = getDatabaseStatus();
+    res.json({ success: true, ...status });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message || 'تعذر فحص قاعدة البيانات المحلية' });
+  }
+});
+
+// تهيئة البيانات الأولية يدويًا
+app.all(['/api/db/seed', '/api/db/seed-defaults'], (req: Request, res: Response) => {
+  try {
+    const force = req.query.force === 'true' || req.body?.force === true;
+    const result = seedDefaultDataIfEmpty(force);
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message || 'فشلت التهيئة' });
+  }
+});
+
+// تصدير نسخة احتياطية كاملة من قاعدة بيانات الكمبيوتر كملف JSON موحد
+app.get('/api/db/export', (req: Request, res: Response) => {
+  try {
+    const collections = [
+      'products', 'categories', 'brands', 'units', 'inventory', 'inventory_movements',
+      'sales', 'sale_items', 'invoices', 'invoice_items', 'customers', 'suppliers',
+      'purchases', 'purchase_items', 'payments', 'payment_transactions', 'returns',
+      'return_items', 'quotations', 'quotation_items', 'warehouses', 'branches',
+      'users', 'roles', 'permissions', 'audit_logs', 'system_settings', 'tax_settings', 'expenses'
+    ];
+    const exportData: Record<string, any[]> = {};
+    for (const name of collections) {
+      exportData[name] = readCollection(name);
+    }
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename=emadco_database_backup_${new Date().toISOString().slice(0, 10)}.json`);
+    res.json({
+      system: 'Emadco ERP Offline PC Database',
+      exportedAt: new Date().toISOString(),
+      data: exportData
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message || 'فشل التصدير' });
+  }
+});
+
+// جلب مجموعة كاملة من ملفات الكمبيوتر
+app.get('/api/db/:collection', (req: Request, res: Response) => {
+  try {
+    const { collection } = req.params;
+    const items = readCollection(collection);
+    res.json({ success: true, collection, count: items.length, data: items });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message || 'تعذر قراءة المجموعة' });
+  }
+});
+
+// جلب وثيقة واحدة بمعرفها
+app.get('/api/db/:collection/:id', (req: Request, res: Response) => {
+  try {
+    const { collection, id } = req.params;
+    const doc = getDocument(collection, id);
+    if (!doc) {
+      return res.status(404).json({ success: false, error: 'العنصر غير موجود' });
+    }
+    res.json({ success: true, data: doc });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message || 'تعذر قراءة العنصر' });
+  }
+});
+
+// حفظ أو تحديث وثيقة في ملف القرص مباشرة
+app.post('/api/db/:collection', (req: Request, res: Response) => {
+  try {
+    const { collection } = req.params;
+    const docData = req.body;
+    if (!docData) {
+      return res.status(400).json({ success: false, error: 'بيانات غير صالحة' });
+    }
+    const saved = saveDocument(collection, docData);
+    res.json({ success: true, message: 'تم الحفظ في ملفات الكمبيوتر بنجاح', data: saved });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message || 'تعذر الحفظ' });
+  }
+});
+
+// تحديث وثيقة
+app.put('/api/db/:collection/:id', (req: Request, res: Response) => {
+  try {
+    const { collection, id } = req.params;
+    const docData = req.body;
+    const saved = saveDocument(collection, { ...docData, id });
+    res.json({ success: true, message: 'تم التحديث في ملفات الكمبيوتر بنجاح', data: saved });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message || 'تعذر التحديث' });
+  }
+});
+
+// حذف وثيقة
+app.delete('/api/db/:collection/:id', (req: Request, res: Response) => {
+  try {
+    const { collection, id } = req.params;
+    const deleted = deleteDocument(collection, id);
+    res.json({ success: true, message: deleted ? 'تم الحذف من ملفات الكمبيوتر' : 'العنصر غير موجود' });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message || 'تعذر الحذف' });
+  }
+});
+
+// تنفيذ عمليات مجمعة دفعة واحدة (Batch Write للبيع والمخزون والفواتير)
+app.post('/api/db-batch', (req: Request, res: Response) => {
+  try {
+    const { operations } = req.body;
+    if (!Array.isArray(operations)) {
+      return res.status(400).json({ success: false, error: 'العمليات يجب أن تكون مصفوفة' });
+    }
+    applyBatch(operations);
+    res.json({ success: true, message: 'تم تطبيق العمليات المجمعة على ملفات الكمبيوتر بنجاح', count: operations.length });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message || 'فشلت العمليات المجمعة' });
+  }
+});
+
 // مسار حماية يضمن عدم انزلاق أي طلب برمجيات /api/* إلى واجهة HTML في حال عدم التطابق
 app.all('/api/*', (req: Request, res: Response) => {
   res.status(404).json({
@@ -1255,6 +1403,13 @@ app.all('/api/*', (req: Request, res: Response) => {
  * إعداد وتشغيل الخادم مع Vite Middleware
  */
 async function startServer() {
+  // تهيئة وتأكيد وجود البيانات الأولية في ملفات الكمبيوتر المحلية
+  try {
+    seedDefaultDataIfEmpty();
+  } catch (seedErr) {
+    console.warn('[LOCAL DB BOOT NOTICE]', seedErr);
+  }
+
   // محاولة استعادة جلسة الواتساب المعتمدة وتجهيز مقبس البث المباشر
   try {
     const isRestored = loadPersistedSession();
@@ -1271,12 +1426,18 @@ async function startServer() {
     }
   }, 60000);
 
-  const distPath = path.join(process.cwd(), 'dist');
-  const publicPath = path.join(process.cwd(), 'public');
+  const appRoot = fs.existsSync(path.join(process.cwd(), 'index.html'))
+    ? process.cwd()
+    : path.resolve(__dirname, '..');
+  const distPath = path.join(appRoot, 'dist');
+  const publicPath = path.join(appRoot, 'public');
 
   // تقديم الملفات الثابتة لجميع البيئات (التطوير والنشر المشترك)
   app.use(express.static(distPath));
   app.use(express.static(publicPath));
+  app.use('/assets', express.static(path.join(appRoot, 'assets')));
+  app.use('/assets', express.static(path.join(distPath, 'assets')));
+  app.use('/assets', express.static(path.join(publicPath, 'assets')));
 
   if (process.env.NODE_ENV !== 'production') {
     try {
@@ -1297,7 +1458,7 @@ async function startServer() {
     }
     const htmlFile = fs.existsSync(path.join(distPath, 'index.html'))
       ? path.join(distPath, 'index.html')
-      : path.join(process.cwd(), 'index.html');
+      : path.join(appRoot, 'index.html');
     res.sendFile(htmlFile);
   });
 

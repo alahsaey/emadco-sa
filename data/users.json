@@ -1,0 +1,54 @@
+[
+  {
+    "id": "user_owner",
+    "email": "alahsaey@gmail.com",
+    "fullName": "صالح حجي مبارك الياسين",
+    "phone": "0500680180",
+    "roleId": "role_system_owner",
+    "roleKey": "system_owner",
+    "branchId": "branch_main",
+    "warehouseId": "wh_main",
+    "password": "123456",
+    "pinCode": "3254",
+    "isActive": true,
+    "customPermissions": [
+      "all"
+    ],
+    "createdAt": "2026-10-28T08:39:25.630Z",
+    "updatedAt": "2026-10-29T03:07:44.335Z",
+    "isOnline": false,
+    "lastActiveAt": "2026-10-29T03:07:41.778Z"
+  },
+  {
+    "id": "user_manager",
+    "email": "amad.co2009@gmail.com",
+    "fullName": "عماد سعد آل سعيد",
+    "phone": "0502223344",
+    "roleId": "role_manager",
+    "roleKey": "manager",
+    "branchId": "branch_main",
+    "warehouseId": "wh_main",
+    "password": "123456",
+    "pinCode": "1188",
+    "isActive": true,
+    "createdAt": "2026-10-28T08:39:25.630Z",
+    "updatedAt": "2026-10-28T08:39:25.630Z",
+    "isOnline": false
+  },
+  {
+    "id": "user_cashier",
+    "email": "amad.co2009@gmail.com",
+    "fullName": "عماد آل سعيد",
+    "phone": "0503334455",
+    "roleId": "role_cashier",
+    "roleKey": "cashier",
+    "branchId": "branch_main",
+    "warehouseId": "wh_showroom",
+    "password": "123456",
+    "pinCode": "1020",
+    "isActive": true,
+    "createdAt": "2026-10-28T08:39:25.630Z",
+    "updatedAt": "2026-10-28T08:39:25.630Z",
+    "isOnline": false
+  }
+]

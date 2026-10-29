@@ -1,23 +1,49 @@
 @echo off
-chcp 65001 > nul
+setlocal enabledelayedexpansion
+cd /d "%~dp0"
+title Emadco ERP Local Server
+
 echo ========================================================
-echo   تشغيل نظام عمادكو ERP محلياً على جهاز المحل
+echo   EMADCO ERP - LOCAL OFFLINE SERVER
 echo ========================================================
 echo.
 
-if not exist node_modules (
-    echo [1/3] جاري تثبيت المكتبات والتبعات للمرة الأولى...
-    call npm install
+where node >nul 2>nul
+if %ERRORLEVEL% EQU 0 (
+    echo [*] Node.js detected. Starting Node server...
+    if exist run_node_server.cjs (
+        node run_node_server.cjs
+        goto :SERVER_STOPPED
+    )
+    if exist dist\server.cjs (
+        node dist\server.cjs
+        goto :SERVER_STOPPED
+    )
 )
 
-echo [2/3] جاري بناء وتجهيز خادم النظام والواجهة...
-call npm run build
-
-echo [3/3] جاري تشغيل النظام السحابي المحلي...
-echo يمكنك فتح النظام من هذا الجهاز عبر: http://localhost:3000
-echo أو من الجهاز الثاني في المحل عبر: http://[IP_الجهاز_الرئيسي]:3000
+echo [*] Starting Windows native server via PowerShell...
+echo [*] Initializing offline system, please wait...
 echo.
-set NODE_ENV=production
-set PORT=3000
-node dist/server.cjs
+
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0offline_server.ps1"
+if %ERRORLEVEL% NEQ 0 (
+    echo [!] Standard launch failed, retrying with unrestricted execution policy...
+    powershell.exe -NoProfile -ExecutionPolicy Unrestricted -File "%~dp0offline_server.ps1"
+)
+
+if %ERRORLEVEL% NEQ 0 (
+    where python >nul 2>nul
+    if !ERRORLEVEL! EQU 0 (
+        echo [*] PowerShell restricted. Launching via Python fallback...
+        start http://localhost:3000
+        python -m http.server 3000
+        goto :SERVER_STOPPED
+    )
+)
+
+:SERVER_STOPPED
+echo.
+echo ========================================================
+echo   Emadco Local Server has ended.
+echo ========================================================
 pause

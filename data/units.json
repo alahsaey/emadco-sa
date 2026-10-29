@@ -1,0 +1,37 @@
+[
+  {
+    "id": "unit_piece",
+    "nameAr": "حبة",
+    "symbol": "حبة",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "unit_box",
+    "nameAr": "كرتون",
+    "symbol": "كرتون",
+    "isDefault": false,
+    "isActive": true
+  },
+  {
+    "id": "unit_kg",
+    "nameAr": "كيلوجرام",
+    "symbol": "كجم",
+    "isDefault": false,
+    "isActive": true
+  },
+  {
+    "id": "unit_meter",
+    "nameAr": "متر طولي",
+    "symbol": "م",
+    "isDefault": false,
+    "isActive": true
+  },
+  {
+    "id": "unit_set",
+    "nameAr": "طقم",
+    "symbol": "طقم",
+    "isDefault": false,
+    "isActive": true
+  }
+]

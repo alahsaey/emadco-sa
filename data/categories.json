@@ -1,0 +1,37 @@
+[
+  {
+    "id": "cat_locks",
+    "nameAr": "كوالين وأقفال ومفصلات",
+    "code": "LCK",
+    "isActive": true,
+    "order": 1
+  },
+  {
+    "id": "cat_tools",
+    "nameAr": "عدد وأدوات يدوية وصناعية",
+    "code": "TLS",
+    "isActive": true,
+    "order": 2
+  },
+  {
+    "id": "cat_sealants",
+    "nameAr": "مواد عازلة وسيليكون وغراء",
+    "code": "SIL",
+    "isActive": true,
+    "order": 3
+  },
+  {
+    "id": "cat_fasteners",
+    "nameAr": "مسامير وبراغي ومثبتات",
+    "code": "FST",
+    "isActive": true,
+    "order": 4
+  },
+  {
+    "id": "cat_building",
+    "nameAr": "مواد بناء وتشطيب عام",
+    "code": "BLD",
+    "isActive": true,
+    "order": 5
+  }
+]
