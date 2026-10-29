@@ -270,13 +270,36 @@
           right: 24px;
         }
       }
-      /* تنسيق شريط أزرار التنقل والوحدات الرئيسي */
-      div[class*="overflow-x-auto"] button {
+      /* تنسيق شريط أزرار التنقل والوحدات الرئيسي الجرافيكي */
+      #main-app-nav-toolbar {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+      }
+      #main-app-nav-toolbar::-webkit-scrollbar {
+        height: 5px;
+      }
+      #main-app-nav-toolbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 999px;
+      }
+      #main-app-nav-toolbar button {
         letter-spacing: -0.01em;
         user-select: none;
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease !important;
       }
-      div[class*="overflow-x-auto"] button:active {
-        transform: scale(0.98);
+      #main-app-nav-toolbar button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+      }
+      #main-app-nav-toolbar button:active {
+        transform: translateY(0) scale(0.97) !important;
+      }
+      .nav-graphic-icon-box {
+        animation: navIconPulse 3s ease-in-out infinite alternate;
+      }
+      @keyframes navIconPulse {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.06); }
       }
     </style>
     <script type="module" crossorigin src="./assets/index-DXj0RJXN.js"></script>
@@ -578,6 +601,7 @@
       // 2. تنظيف القوائم المنسدلة وإزالة الخيار المكرر "سجل التدقيق والأمان" نهائياً
       setInterval(() => {
         ensureFloatingExpensesButton();
+        enhanceNavigationToolbar();
 
         const allNodes = document.querySelectorAll('button, a, div, span');
         allNodes.forEach(el => {
@@ -591,6 +615,226 @@
           }
         });
       }, 400);
+
+      // خريطة الجرافيك والأيقونات الملونة الفاخرة لكل قسم
+      const NAV_GRAPHICS_MAP = {
+        'لوحة القيادة والمؤشرات': { icon: '📊', bg: 'linear-gradient(135deg, #fef3c7, #fde68a)', color: '#b45309', border: '#fcd34d' },
+        'لوحة القيادة': { icon: '📊', bg: 'linear-gradient(135deg, #fef3c7, #fde68a)', color: '#b45309', border: '#fcd34d' },
+        'نقطة البيع (POS)': { icon: '⚡', bg: 'linear-gradient(135deg, #d1fae5, #a7f3d0)', color: '#047857', border: '#6ee7b7' },
+        'المرتجعات وإشعار دائن': { icon: '↩️', bg: 'linear-gradient(135deg, #ffe4e6, #fecdd3)', color: '#be123c', border: '#fda4af' },
+        'سندات القبض والصرف': { icon: '💳', bg: 'linear-gradient(135deg, #ede9fe, #ddd6fe)', color: '#6d28d9', border: '#c4b5fd' },
+        'طرق الدفع وأجهزة POS': { icon: '📱', bg: 'linear-gradient(135deg, #e0f2fe, #bae6fd)', color: '#0369a1', border: '#7dd3fc' },
+        'العملاء والذمم': { icon: '👥', bg: 'linear-gradient(135deg, #ffedd5, #fed7aa)', color: '#c2410c', border: '#fdba74' },
+        'الموردون والمصانع': { icon: '🏭', bg: 'linear-gradient(135deg, #dbeafe, #bfdbfe)', color: '#1d4ed8', border: '#93c5fd' },
+        'المشتريات والتوريد': { icon: '📦', bg: 'linear-gradient(135deg, #ccfbf1, #99f6e4)', color: '#0f766e', border: '#5eead4' },
+        'كتالوج مواد البناء': { icon: '🧱', bg: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)', color: '#4338ca', border: '#a5b4fc' },
+        'المخزون والمستودعات': { icon: '🏬', bg: 'linear-gradient(135deg, #cffafe, #a5f3fc)', color: '#0e7490', border: '#67e8f9' },
+        'المستخدمين والأدوار': { icon: '🛡️', bg: 'linear-gradient(135deg, #f1f5f9, #e2e8f0)', color: '#334155', border: '#cbd5e1' },
+        'سجلات التدقيق': { icon: '📋', bg: 'linear-gradient(135deg, #f3f4f6, #e5e7eb)', color: '#374151', border: '#d1d5db' },
+        'إعدادات النظام والنسخ': { icon: '⚙️', bg: 'linear-gradient(135deg, #fef9c3, #fef08a)', color: '#a16207', border: '#fde047' },
+      };
+
+      let isNavDragBound = false;
+      let navWrapMode = true; // إظهار كافة الأزرار كاملة بصفين لعدم إخفاء أي زر
+
+      function enhanceNavigationToolbar() {
+        let navBar = document.getElementById('main-app-nav-toolbar');
+        if (!navBar) {
+          const allButtons = document.querySelectorAll('button');
+          for (const btn of allButtons) {
+            const txt = (btn.textContent || '').trim();
+            if (txt.includes('كتالوج مواد البناء') || txt.includes('الموردون والمصانع')) {
+              navBar = btn.parentElement;
+              if (navBar) {
+                navBar.id = 'main-app-nav-toolbar';
+                break;
+              }
+            }
+          }
+        }
+
+        if (!navBar) return;
+
+        // تطبيق تنسيق الحاوية الجرافيكية الموحدة
+        navBar.style.display = 'flex';
+        navBar.style.alignItems = 'center';
+        navBar.style.gap = '8px';
+        navBar.style.padding = '10px 12px';
+        navBar.style.background = '#f8fafc';
+        navBar.style.borderRadius = '16px';
+        navBar.style.border = '1.5px solid #e2e8f0';
+        navBar.style.boxShadow = '0 2px 6px -1px rgba(0, 0, 0, 0.05)';
+        navBar.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        navBar.style.overflowX = navWrapMode ? 'visible' : 'auto';
+        navBar.style.flexWrap = navWrapMode ? 'wrap' : 'nowrap';
+        navBar.style.cursor = navWrapMode ? 'default' : 'grab';
+
+        // إضافة ترويسة شريط الأزرار مع أزرار التمرير السريع والتبديل
+        let toolbarHeader = document.getElementById('nav-toolbar-header-bar');
+        if (!toolbarHeader && navBar.parentElement) {
+          toolbarHeader = document.createElement('div');
+          toolbarHeader.id = 'nav-toolbar-header-bar';
+          toolbarHeader.style.cssText = 'display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 0 4px; direction: rtl;';
+          toolbarHeader.innerHTML = `
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:13.5px;font-weight:800;color:#1e293b;">أقسام ووحدات النظام الرئيسية</span>
+              <span style="font-size:11px;background:#e2e8f0;color:#475569;padding:2px 8px;border-radius:999px;font-weight:700;">13 قسماً محاسبياً</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <button id="nav-scroll-right-btn" type="button" title="تمرير لليمين" style="display:${navWrapMode ? 'none' : 'flex'};align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:#ffffff;border:1px solid #cbd5e1;color:#334155;font-weight:bold;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.05);">›</button>
+              <button id="nav-scroll-left-btn" type="button" title="تمرير لليسار" style="display:${navWrapMode ? 'none' : 'flex'};align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:#ffffff;border:1px solid #cbd5e1;color:#334155;font-weight:bold;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.05);">‹</button>
+              <button id="nav-toggle-wrap-btn" type="button" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#1e293b;padding:4px 12px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;">
+                ${navWrapMode ? '⊞ إظهار كشريط أفقي' : '☰ عرض الكل (صفين)'}
+              </button>
+            </div>
+          `;
+          navBar.parentElement.insertBefore(toolbarHeader, navBar);
+
+          document.getElementById('nav-toggle-wrap-btn')?.addEventListener('click', () => {
+            navWrapMode = !navWrapMode;
+            const btn = document.getElementById('nav-toggle-wrap-btn');
+            const rightBtn = document.getElementById('nav-scroll-right-btn');
+            const leftBtn = document.getElementById('nav-scroll-left-btn');
+            if (btn) btn.innerHTML = navWrapMode ? '⊞ إظهار كشريط أفقي' : '☰ عرض الكل (صفين)';
+            if (rightBtn) rightBtn.style.display = navWrapMode ? 'none' : 'flex';
+            if (leftBtn) leftBtn.style.display = navWrapMode ? 'none' : 'flex';
+            enhanceNavigationToolbar();
+          });
+
+          document.getElementById('nav-scroll-right-btn')?.addEventListener('click', () => {
+            navBar.scrollBy({ left: 240, behavior: 'smooth' });
+          });
+          document.getElementById('nav-scroll-left-btn')?.addEventListener('click', () => {
+            navBar.scrollBy({ left: -240, behavior: 'smooth' });
+          });
+        }
+
+        // تمكين السحب التفاعلي بالماوس (Mouse Drag-to-Scroll)
+        if (!isNavDragBound) {
+          isNavDragBound = true;
+          let isDown = false;
+          let startX = 0;
+          let scrollLeft = 0;
+
+          navBar.addEventListener('mousedown', (e) => {
+            if (navWrapMode) return;
+            isDown = true;
+            navBar.style.cursor = 'grabbing';
+            startX = e.pageX - navBar.offsetLeft;
+            scrollLeft = navBar.scrollLeft;
+          });
+
+          window.addEventListener('mouseup', () => {
+            isDown = false;
+            if (navBar && !navWrapMode) navBar.style.cursor = 'grab';
+          });
+
+          navBar.addEventListener('mousemove', (e) => {
+            if (!isDown || navWrapMode) return;
+            e.preventDefault();
+            const x = e.pageX - navBar.offsetLeft;
+            const walk = (x - startX) * 1.6;
+            navBar.scrollLeft = scrollLeft - walk;
+          });
+
+          // دعم عجلة الماوس للتمرير الأفقي السلس
+          navBar.addEventListener('wheel', (e) => {
+            if (navWrapMode) return;
+            if (e.deltaY !== 0) {
+              e.preventDefault();
+              navBar.scrollLeft += e.deltaY * 1.2;
+            }
+          }, { passive: false });
+        }
+
+        // ترقية كل زر بصندوق جرافيكي وتنسيق احترافي عالي الجودة
+        const buttons = Array.from(navBar.querySelectorAll('button'));
+        buttons.forEach((btn) => {
+          let cleanLabel = '';
+          const span = btn.querySelector('span');
+          if (span) {
+            cleanLabel = (span.textContent || '').trim().replace(/[📊⚡⚙️]/g, '').trim();
+          } else {
+            cleanLabel = (btn.textContent || '').trim().replace(/[📊⚡⚙️]/g, '').trim();
+          }
+
+          let graphic = NAV_GRAPHICS_MAP[cleanLabel];
+          if (!graphic) {
+            for (const k in NAV_GRAPHICS_MAP) {
+              if (cleanLabel.includes(k) || k.includes(cleanLabel)) {
+                graphic = NAV_GRAPHICS_MAP[k];
+                break;
+              }
+            }
+          }
+
+          const isActive = btn.classList.contains('bg-slate-900') ||
+                           btn.classList.contains('bg-emerald-600') ||
+                           btn.classList.contains('bg-amber-500') ||
+                           btn.classList.contains('font-black') ||
+                           btn.style.background.includes('#0f172a');
+
+          btn.style.display = 'inline-flex';
+          btn.style.alignItems = 'center';
+          btn.style.gap = '8px';
+          btn.style.padding = '6px 14px';
+          btn.style.borderRadius = '12px';
+          btn.style.fontSize = '12px';
+          btn.style.fontWeight = isActive ? '800' : '700';
+          btn.style.whiteSpace = 'nowrap';
+          btn.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+          btn.style.cursor = 'pointer';
+          btn.style.userSelect = 'none';
+          btn.style.boxSizing = 'border-box';
+          btn.style.height = '38px';
+          btn.style.flexShrink = '0';
+
+          if (isActive) {
+            btn.style.background = '#0f172a';
+            btn.style.color = '#ffffff';
+            btn.style.border = '1.5px solid #0f172a';
+            btn.style.boxShadow = '0 4px 10px rgba(15, 23, 42, 0.25)';
+          } else {
+            btn.style.background = '#ffffff';
+            btn.style.color = '#334155';
+            btn.style.border = '1px solid #e2e8f0';
+            btn.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.04)';
+          }
+
+          // إضافة الصندوق الجرافيكي للأيقونة
+          if (graphic && !btn.querySelector('.nav-graphic-icon-box')) {
+            const existingSvg = btn.querySelector('svg');
+            if (existingSvg) existingSvg.style.display = 'none';
+
+            let existingBox = btn.querySelector('.nav-graphic-icon-box');
+            if (!existingBox) {
+              const iconBox = document.createElement('div');
+              iconBox.className = 'nav-graphic-icon-box';
+              iconBox.style.cssText = `
+                width: 24px;
+                height: 24px;
+                border-radius: 7px;
+                background: ${graphic.bg};
+                border: 1px solid ${graphic.border};
+                color: ${graphic.color};
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 13px;
+                flex-shrink: 0;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+              `;
+              iconBox.innerHTML = `<span>${graphic.icon}</span>`;
+              btn.insertBefore(iconBox, btn.firstChild);
+            }
+          }
+
+          if (span) {
+            span.textContent = cleanLabel;
+            span.style.color = isActive ? '#ffffff' : '#1e293b';
+          }
+        });
+      }
 
       // دالة لتحديد شبكة بطاقات الإحصائيات في منتصف لوحة التحكم بدقة تامة
       function getDashboardStatsGrid() {
